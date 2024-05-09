@@ -1,4 +1,4 @@
-#' Standy clenaing
+#' Standy cleaning
 #'
 #' @param excel_load a "raw data.frame
 #' @param verbose can be true or false
@@ -9,9 +9,6 @@
 #' @examples
 #' some example
 stata2script<- function(excel_load, verbose = T){
-
-
-
 
 
 NMC <- excel_load

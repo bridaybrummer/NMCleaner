@@ -2,7 +2,7 @@
 % Please edit documentation in R/stata2script.R
 \name{stata2script}
 \alias{stata2script}
-\title{Standy clenaing}
+\title{Standy cleaning}
 \usage{
 stata2script(excel_load, verbose = T)
 }
@@ -15,7 +15,7 @@ stata2script(excel_load, verbose = T)
 a clean data.frame
 }
 \description{
-Standy clenaing
+Standy cleaning
 }
 \examples{
 some example
