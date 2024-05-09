@@ -16,3 +16,10 @@
 hello <- function() {
   print("Hello, world!")
 }
+
+if (interactive()) {
+  require("devtools", quietly = TRUE)
+  # automatically attaches usethis
+}
+
+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
