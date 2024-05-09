@@ -1224,5 +1224,3 @@ df_of_duplicates <- data23%>%filter(duplicate %in% "duplicate")
 
 return(list(data_dup33 = data_dup33, tabyl_of_duplicates = tabyl_of_duplicates, df_of_duplicates = df_of_duplicates))
 }
-
-

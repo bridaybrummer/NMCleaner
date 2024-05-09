@@ -1,6 +1,5 @@
 #' @export
 bind_linelist<- function( directory) {
-
   # List all Excel files in the directory
   excel_files <- list.files(directory, pattern = "\\.xlsx$", full.names = TRUE)
 
@@ -11,5 +10,3 @@ bind_linelist<- function( directory) {
     bind_rows()
   return(all_data)
 }
-
-# there are other functions which will assist you inidentifying the most recent file in the directory
