@@ -1,6 +1,6 @@
 # Hello, world!
 #
-# This is an example function named 'hello' 
+# This is an example function named 'hello'
 # which prints 'Hello, world!'.
 #
 # You can learn more about package authoring with RStudio at:
@@ -16,3 +16,13 @@
 hello <- function() {
   print("Hello, world!")
 }
+
+
+if (interactive()) {
+  require("devtools", quietly = TRUE)
+  # automatically attaches usethis
+}
+
+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
+
+use_git()
