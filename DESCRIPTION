@@ -2,12 +2,10 @@ Package: NMCleaner
 Title: What the Package Does (One Line, Title Case)
 Version: 0.0.0.9000
 Authors@R: 
-    person("Brian", "Brummer", , "first.last@example.com")
+    person("Brian", "Brummer", , "first.last@example.com", role = c("aut", "cre"),
+           comment = c(ORCID = "YOUR-ORCID-ID"))
 Description: Assist NMC users to conduct standardised data analysis. 
+License: `use_mit_license()`
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.1
-Depends:
-    R (>= 3.0.2)
-License: MIT
-LazyData: true
