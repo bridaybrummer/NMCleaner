@@ -25,6 +25,14 @@ if (interactive()) {
 
 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
 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
+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
 
+create_github_token()
 use_git()
+?use_github()
 use_github()
+usethis::use_git_remote("origin", url = NULL, overwrite = TRUE)
+use_github()
+git_sitrep()
+
+gitcreds::gitcreds_set()
