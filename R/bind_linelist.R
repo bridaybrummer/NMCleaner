@@ -1,7 +1,16 @@
 
 #Bind Linelsts from an NMC export directory
 
+#' Bind linelist
+#'
+#' @param directory
+#'
+#' @return A data frame with all the linelists from the directory
+#' @export
+#'
+#' @examples .xlsx files are spearated due to to difference CIF forms implemented for each ocnditions. You need to return a single object for all these .xlsx files
 bind_linelist<- function( directory) {
+
   # List all Excel files in the directory
   excel_files <- list.files(directory, pattern = "\\.xlsx$", full.names = TRUE)
 

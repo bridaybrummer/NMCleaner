@@ -7,6 +7,15 @@
 
 #tibble[c(1:100), ]
 
+#' Cleaning function for NMC data
+#'
+#' @param excel_load a tibble with NMC data
+#' @param verbose a logical indicating whether to print progress messages
+#'
+#' @return a cleaned R object
+#' @export
+#'
+#' @examples <- clean< stata2script(dirty)
 stata2script<- function(excel_load, verbose = T){
 
 
