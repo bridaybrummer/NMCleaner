@@ -1,20 +1,18 @@
 # COmverted code from stat do file from chatgpt.
-library(dplyr)
-library(readxl)
-library(tidyverse)
-library(janitor)
-library(lubridate)
-library(grates)
-library(ISOweek)
-library(data.table)
 
 #(tibble)
 #stata2script(tibble)
 
 
+
 #tibble[c(1:100), ]
-#stata2script(excel_load_1, verbose = T)
+
 stata2script<- function(excel_load, verbose = T){
+
+
+
+
+
 NMC <- excel_load
 #nrow(NMC)
 #names(NMC)
@@ -31,7 +29,7 @@ NMC <- excel_load
 # Exclusion of discarded, quality assurance cases, foreign cases
 
 data <- NMC %>%
-  mutate(exceptions = 0)  
+  mutate(exceptions = 0)
 
 names(data) <- str_to_lower(names(data))
 
@@ -103,7 +101,7 @@ data5 <- data4 %>%
   filter(
     #!facility_type %in% "STUDY"
          )
-  
+
 
 data5 %>% nrow() %>%print()
 #data4%>%filter(case_id == "230627_43520481")%>%view()
@@ -114,7 +112,7 @@ xtabs(~is.na(data5$province))
 #data5 %>%
 #  filter(facility_type == "STUDY")%>%
 # View()  # Manually inspect and handle study cases
-# These 
+# These
 
 data5 %>%
   filter(grepl("Nicd", facility))# %>%
@@ -221,7 +219,7 @@ data14 <- data13 #%>%
   #mutate(patient_dob = if_else(as.numeric(as_year(patient_dob)) == 1923, "NA", as_date(patient_dob))) %>%
   #mutate(patient_dob = if_else(month(patient_dob) == 1 & day(patient_dob) == 1 & year(patient_dob) == 1900, NA_Date_, patient_dob))
 
-xtabs(~data14$patient_age + data14$patient_age_unit) 
+xtabs(~data14$patient_age + data14$patient_age_unit)
 
 data14.1 <- data14%>%mutate(
   Age_years = case_when(patient_age_unit == "Days"~ as.numeric(floor(as.numeric(patient_age)/365.25)),
@@ -234,7 +232,7 @@ data14.1 <- data14%>%mutate(
 data14.2 <- data14.1%>% mutate(
     age_dob = #floor(
       as.numeric((difftime( as_date(notification_date),as_date(patient_dob), units = "days")))/365.25
-    #)  
+    #)
   )%>%
     mutate( age_dob = ifelse( is.na(age_dob), Age_years, age_dob))%>%
   mutate(agecategory = case_when(
@@ -259,7 +257,7 @@ data14.2 <- data14.1%>% mutate(
     "0-4", "5-9", "10-14", "15-19", "20-24", "25-29",
     "30-34", "35-39", "40-44", "45-49", "50-54", "55-59",
     "60-64", "65+", "Unknown")))
-  
+
 print("Hello15")
 # Clean age variables
 data15 <- data14.2 %>%
@@ -314,8 +312,8 @@ data15 <- data14.2 %>%
 
 #xtabs(~ age_group, data = data15)
 #xtabs(~ agecategory, data = data15)
-#xtabs(~Age_years+agecategory, data = data15%>%filter(agecategory == "0-4")) 
-#xtabs(~patient_age+agecategory + patient_age_unit, data = data15%>%filter(agecategory == "0-4")) 
+#xtabs(~Age_years+agecategory, data = data15%>%filter(agecategory == "0-4"))
+#xtabs(~patient_age+agecategory + patient_age_unit, data = data15%>%filter(agecategory == "0-4"))
 
 # Clean gender variable
 print("hello data16")
@@ -354,16 +352,17 @@ dataCat1 <- data.frame(condition = c("Acute Flaccid Paralysis", "Acute rheumatic
 
 # Create the nmccategories column based on the conditions
 
-source("nmc_contacts_list.R")
+source("R/nmc_contacts_list.R")
 
-# I would rather stringdist match with the dataframe reference. 
+
+# I would rather stringdist match with the dataframe reference.
 
 print("hello fuzzy")
 
 
-data16_1 <- 
+data16_1 <-
   fuzzyjoin::stringdist_left_join(data16%>%mutate(match_condition = str_to_lower(condition)), condition_df%>%mutate(match_condition = str_to_lower(condition)), by =c("match_condition") , method = "jw", max_dist = 0.03)%>%
-  # rename condition.x to condition 
+  # rename condition.x to condition
   rename(condition = condition.x,
          match_condition = match_condition.x)
 
@@ -486,9 +485,9 @@ data_dup <- data23 %>%
 # n = 105 - some of these are different patients with the same NMC CaseID number - cannot just drop duplicates - extract for reporting purposes
 nrow(data_dup)
 
-# find a way to identify duplciates by condition and name/surname, 
-# and 
-# duplicates of people with different conditions. 
+# find a way to identify duplciates by condition and name/surname,
+# and
+# duplicates of people with different conditions.
 
 # Calling direct duplicates
 names(data_dup)
@@ -519,12 +518,12 @@ library(dplyr)
 # Check cases that missed the automated linkage
 
 ###################
-# Deduplciation process. 
+# Deduplciation process.
 ##################
 
 # first dedupicate by condition , facility, name, sunrame, gender and dob
-data_dup4 <- data_dup3 %>% 
-  group_by(condition, facility, patient_name, patient_surname, gender, patient_dob) %>% 
+data_dup4 <- data_dup3 %>%
+  group_by(condition, facility, patient_name, patient_surname, gender, patient_dob) %>%
   mutate(duplicate = ifelse(n() > 1, "duplicate", "unique"),
          dup_number = row_number()) %>%
   ungroup()
@@ -547,8 +546,8 @@ xtabs(~ duplicate, data = data_dup4)
 # keep only the first occurence
 data_dup5 <- data_dup4 %>%
   filter(dup_number == 1)%>%
-  arrange(dup_number, condition, episode_number, case_id, notification_date, case_type, 
-          patient_name, patient_surname, patient_dob, facility, folder_no, province, gender) 
+  arrange(dup_number, condition, episode_number, case_id, notification_date, case_type,
+          patient_name, patient_surname, patient_dob, facility, folder_no, province, gender)
 
 data_dup5
 
@@ -558,13 +557,13 @@ data_dup5
 #data_dup6<- data_dup5%>%filter(!condition == "Respiratory disease caused by a novel respiratory pathogen")
 
 #data_dup6$condition%>%unique
-#drop Respiratory pathogen 
+#drop Respiratory pathogen
 
 
 ########################
 ########################
 
-data_dup5 %>% 
+data_dup5 %>%
   arrange(case_type) %>%
   filter(duplicate == "duplicate" & case_type == "Merged") %>%nrow()
 # there are no duplciates in merged
@@ -580,15 +579,15 @@ print("data_dup5")
 data_dup6 %>% nrow() %>%print()
 print("data_dup5")
 
-data_dup5 %>% 
+data_dup5 %>%
   count()
 
-data_dup6 %>% 
+data_dup6 %>%
   count()
 
 
-# Now deduplcaite using mor relaxed variables. 
-data_dup7<- data_dup6 %>% 
+# Now deduplcaite using mor relaxed variables.
+data_dup7<- data_dup6 %>%
   group_by(condition, facility, patient_name, patient_surname, gender) %>%
   mutate(duplicate = ifelse(n() > 1, "duplicate", "unique"),
        dup_number = row_number()) %>%
@@ -603,8 +602,8 @@ xtabs(~dup_number, data_dup7)
 
 #no duplicates
 
-data_dup8 <- data_dup7 %>% 
-  group_by(condition, facility, patient_name, patient_surname, folder_no, gender) %>% 
+data_dup8 <- data_dup7 %>%
+  group_by(condition, facility, patient_name, patient_surname, folder_no, gender) %>%
   mutate(duplicate = ifelse(n() > 1, "duplicate", "unique"),
          dup_number = row_number()) %>%
   ungroup()
@@ -617,15 +616,15 @@ print("data_dup8")
 xtabs(~dup_number, data_dup8)
 
 
-# remove those without folder numebrs. 
-data_dup9 <- data_dup8 %>% 
+# remove those without folder numebrs.
+data_dup9 <- data_dup8 %>%
   arrange(folder_no) %>%
-  arrange( condition, folder_no, episode_number, case_id, notification_date, case_type, 
-          patient_name, patient_surname, patient_dob, facility, province, gender) 
+  arrange( condition, folder_no, episode_number, case_id, notification_date, case_type,
+          patient_name, patient_surname, patient_dob, facility, province, gender)
   #filter(duptag3 > 0) %>%
   #filter(folder_no != ""| !is.na(folder_no)) # this is a step that seemed to be conufsed wiht the manual linkage process. It will no longer be implemented as aof 0911023 (so for notifications reported in Cotber and onwards. )
 
-# it is norma for the folder number to discard a whole pile of cases. 
+# it is norma for the folder number to discard a whole pile of cases.
 
 data_dup9 %>% nrow() %>%print()
 print("data_dup9")
@@ -634,15 +633,15 @@ print("data_dup9")
 #xtabs(~ is.na(data_dup32$folder_no))
 
 
-data_dup9 %>% 
+data_dup9 %>%
   count()
 
 
 library(dplyr)
 
-# Facilities are different for referred patients so we dedupclaite without facility. 
-data_dup10 <- data_dup9 %>% 
-  group_by(condition, patient_dob, patient_name, patient_surname, gender, patient_age) %>% 
+# Facilities are different for referred patients so we dedupclaite without facility.
+data_dup10 <- data_dup9 %>%
+  group_by(condition, patient_dob, patient_name, patient_surname, gender, patient_age) %>%
   mutate(duplicate = ifelse(n() > 1, "duplicate", "unique"),
          dup_number = row_number()) %>%
   ungroup()
@@ -656,10 +655,10 @@ print("data_dup10")
 
 #data_dup10%>%filter(dup_number == 1)
 
-# Now include facility, dob etc. . 
+# Now include facility, dob etc. .
 
-data_dup11 <- data_dup10 %>% 
-  group_by(condition, facility, patient_dob, patient_name, patient_surname) %>% 
+data_dup11 <- data_dup10 %>%
+  group_by(condition, facility, patient_dob, patient_name, patient_surname) %>%
   mutate(duplicate = ifelse(n() > 1, "duplicate", "unique"),
          dup_number = row_number()) %>%
   ungroup()
@@ -679,8 +678,8 @@ data_dup12%>% nrow() %>%print()
 
 # Now exclude the condition. this will exclude repeat TB cases though. # i guess if it happens within the same month there may be some kind of error
 
-data_dup13 <- data_dup12 %>% 
-  group_by(patient_name, patient_surname, patient_dob, facility) %>% 
+data_dup13 <- data_dup12 %>%
+  group_by(patient_name, patient_surname, patient_dob, facility) %>%
   mutate(duplicate = ifelse(n() > 1, "duplicate", "unique"),
          dup_number = row_number()) %>%
   ungroup()
@@ -696,8 +695,8 @@ data_dup14%>% nrow() %>%print()
 
 print("Hello15")
 
-data_dup15 <- data_dup14 %>% 
-  group_by(condition, case_source, folder_no, facility, patient_dob) %>% 
+data_dup15 <- data_dup14 %>%
+  group_by(condition, case_source, folder_no, facility, patient_dob) %>%
   mutate(duplicate = ifelse(n() > 1, "duplicate", "unique"),
          dup_number = row_number()) %>%
   ungroup()
@@ -718,11 +717,11 @@ data_dup16 %>% nrow() %>%print()
 #######################
 
 print("Hello17")
-  
-  
-  
-data_dup17 <- data_dup16%>% 
-  group_by(patient_surname, patient_dob, condition, folder_no) %>% 
+
+
+
+data_dup17 <- data_dup16%>%
+  group_by(patient_surname, patient_dob, condition, folder_no) %>%
   mutate(duplicate = ifelse(n() > 1, "duplicate", "unique"),
          dup_number = row_number()) %>%
   ungroup()
@@ -736,7 +735,7 @@ data_dup18<-data_dup17%>%filter(
 
 data_dup18 %>% nrow() %>%print()
 
-data_dup18 %>% 
+data_dup18 %>%
   count()
 
 #write.csv(df, "March2023_afterdeduplication.csv", row.names = FALSE)
@@ -778,7 +777,7 @@ mutate(case_type = case_when(
     TRUE ~ case_type
   ))%>%
   mutate(case_type = case_when(grepl("^lab",case_type,  ignore.case = T ) ~ "Laboratory notifications",
-                               grepl("^merge",case_type,  ignore.case = T) ~ "Merged Cases", 
+                               grepl("^merge",case_type,  ignore.case = T) ~ "Merged Cases",
                                grepl("^clin",case_type,  ignore.case = T) ~ "Clinical notifications"))
 
 
@@ -854,7 +853,7 @@ data_dup25 %>%
 
 data_dup25 %>% nrow() %>%print()
 ######################
-# Creating back acapture vars. 
+# Creating back acapture vars.
 ######################
 names(data_dup25)
 xtabs(~data_dup25$Year_diagnosis)
@@ -878,10 +877,10 @@ data_dup26 <- data_dup25 %>%
     grepl("lab|merged", ignore.case = TRUE ,case_type) & is.na(diagnosis_date) ~ "Current",
     floor_date(lubridate::as_date(diagnosis_date), "month") %in%  floor_date(lubridate::as_date(notification_date),"month")  ~ "Current", # if diagnosis month is the same as the notification month
     lubridate::as_date(diagnosis_date) <  (floor_date(lubridate::as_date(notification_date),"month") - days(14))  ~ "Delayed", #All cases diagnosed in previous months and before the last 14 days of the previous month
-    between( 
+    between(
       lubridate::as_date(diagnosis_date ), as_date(
-        (floor_date(lubridate::as_date(notification_date), "month") - days(15))), 
-      as_date(floor_date(lubridate::as_date(notification_date), "month") 
+        (floor_date(lubridate::as_date(notification_date), "month") - days(15))),
+      as_date(floor_date(lubridate::as_date(notification_date), "month")
       ))
     ~ "Back capture", #All cases diagnosed in the last 14 days from the previous month
     .default = "unknown")
@@ -899,20 +898,20 @@ data_dup26 <- data_dup25 %>%
   Back_capture = case_when(
     grepl("lab|merged", ignore.case = TRUE ,case_type) & is.na(diagnosis_date) ~ "Current",
     floor_date(lubridate::as_date(diagnosis_date), "month") %in%  floor_date(lubridate::as_date(notification_date),"month")  ~ "Current", # if diagnosis month is the same as the notification month
-    
+
     lubridate::as_date(diagnosis_date) >  (floor_date(lubridate::as_date(notification_date),"month") - days(14))  ~ "Delayed", #All cases diagnosed in previous months and before the last 14 days of the previous month
-    
-    between( 
+
+    between(
       lubridate::as_date(diagnosis_date ), as_date(
-        (floor_date(lubridate::as_date(notification_date), "month") - days(15))), 
-      as_date(floor_date(lubridate::as_date(notification_date), "month") 
+        (floor_date(lubridate::as_date(notification_date), "month") - days(15))),
+      as_date(floor_date(lubridate::as_date(notification_date), "month")
       ))
     ~ "Back capture", #All cases diagnosed in the last 14 days from the previous month
     .default = "unknown")
   )
 
-# We want to see what the time from when it is diagnosed to when it is reported is. 
-# ideally, wa use the diagnosis date and notification_date. 
+# We want to see what the time from when it is diagnosed to when it is reported is.
+# ideally, wa use the diagnosis date and notification_date.
 
 
 
@@ -933,17 +932,17 @@ data_dup26_1<- data_dup26 %>%
     )
   )#%>%filter(between( time_to_notification, 0,30))%>%
 
-# make a violin plot of the time_to_notification with facets for nmccatgeory 
+# make a violin plot of the time_to_notification with facets for nmccatgeory
 
   #ggplot(aes(x = nmccategories, y = time_to_notification)) +
   #geom_violin(aes(fill=nmccategories ))+
   #as_excel()
 
-# make a ridgplot of these. 
+# make a ridgplot of these.
   #ggplot(aes(x = time_to_notification, y = nmccategories , fill = nmccategories)) +
 #ggridges::stat_density_ridges(show.legend = FALSE,
 #                              panel_scaling = TRUE,
-#                              scale = 1.5, 
+#                              scale = 1.5,
 #                              alpha = 0.75,
                               #jittered_points = jittered_points,
                               #position = position_points_jitter(width = 0.05, height = 0),
@@ -968,10 +967,10 @@ data_dup27<- data_dup26_1%>%
   mutate(age = patient_age)%>%
     mutate(province  = ifelse(is.na(province), patient_province , province))%>%
   left_join(., province_abbreviations, by = c("province" ))
-  
 
 
- # The NMC used to have a privince abbrevaition before the province, and disrict string variabes. We now rather just match them 
+
+ # The NMC used to have a privince abbrevaition before the province, and disrict string variabes. We now rather just match them
 #data_dup27<- data_dup26%>%
 #  mutate(prov_ =sapply(strsplit(province, " "), function(x) x[1]),
 #                                 age = patient_age)%>%
@@ -983,7 +982,7 @@ xtabs(~ is.na(data_dup27$prov_))
 
 data_dup27%>%filter(condition == "Food borne illness outbreak")
 
-# need directionon this one. 
+# need directionon this one.
 data_dup27 %>%
   mutate(NotFBO = if_else(condition == "Food borne illness outbreak", "", as.character(NA))) %>%
   arrange(facility) %>%
@@ -1005,15 +1004,15 @@ data_dup27 %>%
 data_dup27%>%names()
 
 data_dup28<- data_dup27 #%>%
-  #select(nmccategories, condition, case_id, case_type, 
-  #       epidemiological_classification, facility, facility_sector, facility_type, 
-  #       facility_classification, district, sub_district, province, prov_, notifier, 
+  #select(nmccategories, condition, case_id, case_type,
+  #       epidemiological_classification, facility, facility_sector, facility_type,
+  #       facility_classification, district, sub_district, province, prov_, notifier,
   #       case_source, symptom_date, Year_symptoms, Month_symptoms, diagnosis_date, Year_diagnosis, Month_diagnosis,
-  #       diagnosis_method, notification_date, Year_notification, Month_notification, time_to_notification, Back_capture, 
-  #      folder_no, patient_name, patient_surname, patient_dob, age, agecategory, gender, #pregnancystatus, 
-  #      id_type, patient_id_no, 
-  #      patient_passport_no, patient_contact_no, patient_country, patient_province, patient_suburb, patient_city, symptoms, 
-  #       treatment, patient_vital_status, patient_death_date, patient_admission_status, patient_has_travelled, #travelhistory, 
+  #       diagnosis_method, notification_date, Year_notification, Month_notification, time_to_notification, Back_capture,
+  #      folder_no, patient_name, patient_surname, patient_dob, age, agecategory, gender, #pregnancystatus,
+  #      id_type, patient_id_no,
+  #      patient_passport_no, patient_contact_no, patient_country, patient_province, patient_suburb, patient_city, symptoms,
+  #       treatment, patient_vital_status, patient_death_date, patient_admission_status, patient_has_travelled, #travelhistory,
   #       vaccination_status, vaccination_last_date, specimen_collected, specimen_barcode, episode_number,
   #       admissiondate, ethnicgroup, cchypertension) %>%
   #arrange(Back_capture, diagnosis_date) #%>%
@@ -1032,10 +1031,10 @@ xtabs(~ patient_admission_status, data = data_dup27, addNA = T)
 
 
 #data_dup29 <- data_dup27 %>%mutate(
-#  HFcomplete = case_when( !is.na(admissiondate) ~ "Yes", 
+#  HFcomplete = case_when( !is.na(admissiondate) ~ "Yes",
 #                          nmccategories == 1 & patient_admission_status == "Inpatient" ~ "Yes",
-#                          !is.na(ethnicgroup ) ~ "Yes", 
-#                          !is.na(cchypertension )~ "Yes", 
+#                          !is.na(ethnicgroup ) ~ "Yes",
+#                          !is.na(cchypertension )~ "Yes",
 #  .default = "No" ))%>%
 #  mutate(HFcomplete = if_else(patient_admission_status == "Discharged" & HFcomplete == "" & nmccategories == 1, "No", HFcomplete)) %>%
 #  mutate(HFcomplete = if_else(patient_admission_status == "Inpatient" & HFcomplete == "" & nmccategories == 1, "No", HFcomplete)) %>%
@@ -1043,8 +1042,8 @@ xtabs(~ patient_admission_status, data = data_dup27, addNA = T)
 #  mutate(HFcomplete = if_else(patient_admission_status == "Unknown" & HFcomplete == "" & nmccategories == 1, "NA", HFcomplete)) %>%
 #  mutate(HFcomplete = if_else(patient_admission_status == "Outpatient" & HFcomplete == "" & nmccategories == 1, "NA", HFcomplete))
 
-hospital_vars<- c("symptoms", 
-                  "patientheight", 
+hospital_vars<- c("symptoms",
+                  "patientheight",
                   "patientweight", "ethnicgroup", "currentoccupation", "cchypertension", "ccdiabetes", "cctb", "cchiv", "admissiondate", "admissionward", "admissiontreatment", "patientoutcome", "outcomedate")
 
 
@@ -1060,7 +1059,7 @@ data_dup29 <- data_dup27%>%mutate(
            !is.na(symptoms) & hf_completeness_score == 1/length(hospital_vars) ~ "Only Symptoms completed", .default = hosptal_completeness_cat)
   )%>%
   mutate(hosptal_completeness_cat = factor(hosptal_completeness_cat, levels = c("Complete", "Incomplete", "Only Symptoms completed", "Not Attempted")))
-  
+
 # Count patient_admission_status
 
 xtabs(~ patient_admission_status, data = data_dup29)
@@ -1081,21 +1080,21 @@ xtabs(~data_dup29$gender, addNA = T)
 
 data_dup30 <- data_dup29 %>%
   mutate(source_2 = ifelse(grepl("^clinical", case_type, ignore.case = T) | grepl("^merge", case_type, ignore.case = T)  ,  "Clinical & Merged","Lab only"))%>%
-  
+
   mutate(patient_admission_status = ifelse(is.na(patient_admission_status), "Unknown", patient_admission_status),
          patient_vital_status = ifelse(is.na(patient_vital_status), "Unknown", patient_vital_status)
          )
-  
+
 
 xtabs(~ case_type + source_2, data = data_dup30)
 xtabs(~ patient_admission_status , data = data_dup30, addNA = T)
 xtabs(~ patient_vital_status , data = data_dup30, addNA = T)
 
-data_dup31 <- data_dup30 %>% # adjust this so that the android etc is under app. 
+data_dup31 <- data_dup30 %>% # adjust this so that the android etc is under app.
   mutate(capture_type = case_source) %>%
   mutate(capture_type = ifelse(grepl("android|ios|web", ignore.case = TRUE, capture_type), "App", capture_type)) %>%
   mutate(capture_type = ifelse(grepl("sdw", ignore.case = TRUE, capture_type), "App", capture_type))%>%
-  mutate( censor = case_when(patient_vital_status == "Deceased" ~ "Deceased", 
+  mutate( censor = case_when(patient_vital_status == "Deceased" ~ "Deceased",
                             .default =  "Not Deceased"))%>%
   mutate(censor = factor(censor, levels = c("Not Deceased", "Deceased")))%>%
   mutate(capture_type2 = case_when(capture_type == "Android" | capture_type == "iOS" |capture_type == "Web"  ~ "App",
@@ -1119,7 +1118,7 @@ data_dup32 <- data_dup31 %>%
   mutate(province = sub("^[^ ]+ ", "", province),
          facility_sector = str_to_title(facility_sector))
 
-#### ensure malaria is almost all confirmed. 
+#### ensure malaria is almost all confirmed.
 
 hep_pattern <- "(?<=Hepatitis\\s)[A-Za-z]+"
 #make a pattern for what is contained in brackets
@@ -1138,80 +1137,80 @@ data_dup33 <- data_dup32 %>%
   ) %>%
   mutate(
     case_definition = case_when(
-      case_type %in% c("Merged Cases") & 
+      case_type %in% c("Merged Cases") &
         !condition %in% c("Diphtheria", "Cholera", "Meningococcal Disease") ~ "Confirmed",
       TRUE ~ case_definition
     )
   ) %>%
   mutate(
     case_definition = ifelse(condition == "Congenital rubella syndrome" &
-                               !grepl("confirmed", epidemiological_classification, ignore.case = TRUE), 
-                             "Suspected", 
+                               !grepl("confirmed", epidemiological_classification, ignore.case = TRUE),
+                             "Suspected",
                              case_definition)
   ) %>%
   mutate(
-    case_definition = ifelse(condition == "Cholera" & 
-                               grepl("labor", epidemiological_classification, ignore.case = TRUE), 
-                             "Confirmed", 
+    case_definition = ifelse(condition == "Cholera" &
+                               grepl("labor", epidemiological_classification, ignore.case = TRUE),
+                             "Confirmed",
                              case_definition)
   ) %>%
   mutate(
-    case_definition = ifelse(condition == "Malaria" & 
-                               grepl("rapid", diagnosis_method, ignore.case = TRUE), 
-                             "Confirmed", 
+    case_definition = ifelse(condition == "Malaria" &
+                               grepl("rapid", diagnosis_method, ignore.case = TRUE),
+                             "Confirmed",
                              case_definition)
     )%>%
-  mutate( 
-    case_definition = ifelse( condition == "Malaria" & 
-                                diagnosis_method == "Laboratory confirmed", 
-                              
-                            "Confirmed", 
+  mutate(
+    case_definition = ifelse( condition == "Malaria" &
+                                diagnosis_method == "Laboratory confirmed",
+
+                            "Confirmed",
                             case_definition)
     )%>%
-  mutate( 
+  mutate(
     case_definition = ifelse( condition == "Malaria" ,
-                              "Confirmed", 
+                              "Confirmed",
                               case_definition)
     )%>%
-      
+
   mutate(
     case_definition = factor(case_definition, levels = c("Suspected", "Confirmed"))
   ) %>%
-  
-  # rename conditions 
-  
+
+  # rename conditions
+
   mutate(
     condition = condition %>%str_to_lower%>%str_to_sentence,
-    condition = ifelse(grepl("hepatitis", ignore.case = TRUE, condition), 
-                       
-                       paste0( "Hepatitis ", str_to_upper(str_extract(condition, hep_pattern))), 
-                       
-                       condition), 
-    condition = ifelse(grepl("xdr|mdr|vhf|hus", ignore.case = TRUE, condition), 
-                       
-                       paste0( str_extract(condition , before_brackets_pattern ), str_to_upper(str_extract(condition, in_brackets_pattern))), 
-                       
+    condition = ifelse(grepl("hepatitis", ignore.case = TRUE, condition),
+
+                       paste0( "Hepatitis ", str_to_upper(str_extract(condition, hep_pattern))),
+
                        condition),
-    
+    condition = ifelse(grepl("xdr|mdr|vhf|hus", ignore.case = TRUE, condition),
+
+                       paste0( str_extract(condition , before_brackets_pattern ), str_to_upper(str_extract(condition, in_brackets_pattern))),
+
+                       condition),
+
     condition = gsub("type b", "type B", condition),
-         
+
          vaccination_status = factor(
-           case_when( #is.na(vaccination_status) | 
-                                           grepl("unknown", ignore.case = TRUE,  vaccination_status) ~ "Reported Unknown",  
-                                           vaccination_status %in% "Not applicable" ~ "Reported Unknown", 
-        #                                   vaccination_status %in% "NA" ~ "Missing", 
+           case_when( #is.na(vaccination_status) |
+                                           grepl("unknown", ignore.case = TRUE,  vaccination_status) ~ "Reported Unknown",
+                                           vaccination_status %in% "Not applicable" ~ "Reported Unknown",
+        #                                   vaccination_status %in% "NA" ~ "Missing",
                                             vaccination_status %in% "Up-to-date" ~ "Reported Up-to-date",
                                             vaccination_status %in% "Not vaccinated" ~ "Reported Not Vaccinated",
-         .default  = vaccination_status) , 
+         .default  = vaccination_status) ,
         levels = c( "Reported Up-to-date", "Reported Not Vaccinated", "Reported Unknown", NA)
-    
+
     )
     )%>%
   filter( !( condition == "Malaria"& case_definition == "Suspected" ) )
-  
 
-# congential Rubella syndrome can only be suspected or confirmed if there is an epi classification and/or it is a merged case. 
-# also need to check on cholera and diptheria numbers. 
+
+# congential Rubella syndrome can only be suspected or confirmed if there is an epi classification and/or it is a merged case.
+# also need to check on cholera and diptheria numbers.
 
 ######
 
