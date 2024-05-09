@@ -1,5 +1,13 @@
+#' Standy clenaing
+#'
+#' @param excel_load a "raw data.frame
+#' @param verbose can be true or false
+#'
+#' @return a clean data.frame
 #' @export
-
+#'
+#' @examples
+#' some example
 stata2script<- function(excel_load, verbose = T){
 
 

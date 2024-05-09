@@ -1,4 +1,12 @@
+#' bind_linelist
+#'
+#' @param directory
+#'
+#' @return a tibble
 #' @export
+#'
+#' @examples
+#' not much
 bind_linelist<- function( directory) {
   # List all Excel files in the directory
   excel_files <- list.files(directory, pattern = "\\.xlsx$", full.names = TRUE)
