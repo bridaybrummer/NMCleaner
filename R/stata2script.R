@@ -320,7 +320,7 @@ data15 <- data14.2 %>%
 # Clean gender variable
 print("hello data16")
 
-library(dplyr)
+#library(dplyr)
 
 data16 <- data15 %>%
   mutate(
@@ -402,7 +402,7 @@ table(data17$condition, data17$nmccategories)
 
 # Exlude cat4?
 
-library(tidyverse)
+#library(tidyverse)
 
 # Checking the plausibility of dates
 # codebook symptom_date diagnosis_date notification_date
@@ -514,7 +514,7 @@ data_dup3 %>%
 
 count(data_dup3)
 
-library(dplyr)
+#library(dplyr)
 
 # Check cases that missed the automated linkage
 
@@ -638,7 +638,7 @@ data_dup9 %>%
   count()
 
 
-library(dplyr)
+#library(dplyr)
 
 # Facilities are different for referred patients so we dedupclaite without facility.
 data_dup10 <- data_dup9 %>%
@@ -742,7 +742,7 @@ data_dup18 %>%
 #write.csv(df, "March2023_afterdeduplication.csv", row.names = FALSE)
 
 
-library(dplyr)
+#library(dplyr)
 colSums(is.na(data_dup18))
 
 data_dup18
@@ -807,7 +807,7 @@ data_dup21 %>% nrow() %>%print()
 # Check the counts
 count(data_dup21)
 
-library(dplyr)
+#library(dplyr)
 
 # Malaria notifications
 malaria <- data_dup21%>%
@@ -1020,7 +1020,7 @@ data_dup28<- data_dup27 #%>%
   #save(file = "output_file.csv", overwrite = TRUE)
 
 
-library(tidyverse)
+#library(tidyverse)
 
 # Identifying completed hospital form
 data_dup27%>%names()

@@ -12,4 +12,11 @@ RoxygenNote: 7.3.1
 Imports: 
     glue
 Depends: 
-    tidyverse
+    dplyr,
+    ggh4x,
+    ggplot2,
+    knitr,
+    readxl,
+    sf,
+    tidyverse,
+    tinytex
