@@ -380,7 +380,7 @@ dataCat1 <- data.frame(condition = c("Acute Flaccid Paralysis", "Acute rheumatic
 
 # Create the nmccategories column based on the conditions
 
-source("nmc_contacts_list.R")
+#source("nmc_contacts_list.R")
 
 # I would rather stringdist match with the dataframe reference.
 
