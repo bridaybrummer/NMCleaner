@@ -1,6 +1,6 @@
 #' Cleans NMC data for reporting
 #'
-#' @param excel_load a tibble
+#' @param NMC a tibble
 #' @param verbose a logical
 #'
 #' @return a tibble
@@ -14,8 +14,34 @@
 #' @import stringr
 #'
 #' @examples some example
-stata2script<- function(excel_load, verbose = T){
-NMC <- excel_load
+stata2script<- function(NMC, verbose = T){
+
+
+  names(NMC) <- str_to_lower(names(NMC))
+
+  exclude_vars_early<-names(NMC)[c(1:17, 22:length(NMC))] # we are picking vars to exclude so we only chnage the opposite of those for the matching.
+
+  include_vars <- setdiff(names(NMC), exclude_vars_early) # this will make the inverse of the excluded vars
+
+  #NMC%>%mutate(across(contains("date"), as_date ))%>%
+  #  mutate(across(contains("date"), as.character))%>%
+  #  mutate(across(contains("date"), str_to_lower))%>%select(notification_date)
+  tabyl(dat = NMC, condition, epidemiological_classification )
+
+  NMC1 <- NMC %>%
+    mutate(across(contains("date"), as_date)) %>%
+    mutate(across(all_of(include_vars), as.character)) %>% #string stadnardisation
+    mutate(across(all_of(setdiff(include_vars, "notification_date")), str_to_lower)) %>% #string stadnardisation
+    #clean_names%>%
+    mutate(
+      case_type = factor(case_type, levels= c("Clinical", "Lab", "Merged")) )
+
+  NMC1$notification_date
+
+  NMC1$months<- as.character(as_yearmonth(as_date(NMC1$notification_date)))
+
+
+NMC <- NMC1
 #nrow(NMC)
 #names(NMC)
 # Check Notifiation_date by quarter and month
