@@ -4,10 +4,10 @@
 \alias{stata2script}
 \title{Cleans NMC data for reporting}
 \usage{
-stata2script(excel_load, verbose = T)
+stata2script(NMC, verbose = T)
 }
 \arguments{
-\item{excel_load}{a tibble}
+\item{NMC}{a tibble}
 
 \item{verbose}{a logical}
 }
