@@ -5,6 +5,8 @@
 #' @return a tibble
 #' @export
 #'
+#' @import readxl
+#'
 #' @examples
 #' not much
 bind_linelist<- function( directory) {
