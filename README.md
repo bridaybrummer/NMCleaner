@@ -43,7 +43,7 @@ it from your device.
 
 The {NMCleaner} package is based off of the cleaning **.do** files
 compiled by Mabore Morifi and Lehlohonolo Chandu; As such, the main
-cleaning function is called \[`stata2script()`\].
+cleaning function is called [`stata2script()`].
 
 The aim of the package is three-fold, 1) to make the transition to R
 easy for a busy epidemiologist. 2) To standardise cleaning practices
@@ -67,7 +67,7 @@ and other common outputs for sitrep or academic outputs.
 
 ### Bind .xlsx files from the NMC linelist export
 
-Use \[`bind_linelist()`\] to produce a \[\`data.frame’\] from the
+Use [`bind_linelist()`] to produce a [`data.frame’] from the
 directory that contains the .xlsx files downlaoded form the NMC.
 
 ``` r
@@ -75,7 +75,7 @@ directory that contains the .xlsx files downlaoded form the NMC.
 #dirty_dataframe <- bind_linelist("path/to/linelist/folder")
 ```
 
-Use \[`stata2script()`\] to produce the cleaned data. The return object
+Use [`stata2script()`] to produce the cleaned data. The return object
 is a list of other datafrmes which shows the duplicates that were
 removed.
 

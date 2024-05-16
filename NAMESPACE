@@ -3,6 +3,7 @@
 export(at_a_glance)
 export(bind_linelist)
 export(clean_labels)
+export(shapes)
 export(stata2script)
 export(trim_tbl)
 import(dplyr)

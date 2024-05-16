@@ -75,13 +75,12 @@ Use [`stata2script()`] to produce the cleaned data. The return object is a list 
 #clean_df<- clean$data_dup33
 ```
 
-
+### You could use a function that leaverages gtsummary for a quick table
 ```{r, evaluate = FALSE}
 
 #clean_df<- clean$data_dup33%>%
-#  selet(case_definition, condition) %>%
-#  tbl_summary(by = case_defintiion)
 
+#clean_df %>%  at_a_glance()
 
 ```
 
