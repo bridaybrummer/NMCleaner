@@ -13,10 +13,17 @@ Imports:
     glue
 Depends: 
     dplyr,
+    flextable,
+    forcats,
     ggh4x,
     ggplot2,
+    grates,
+    gtsummary,
+    haven,
     janitor,
     knitr,
+    lubridate,
+    magrittr,
     R (>= 2.10),
     readxl,
     sf,
