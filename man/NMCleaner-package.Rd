@@ -4,12 +4,12 @@
 \name{NMCleaner-package}
 \alias{NMCleaner}
 \alias{NMCleaner-package}
-\title{NMCleaner: What the Package Does (One Line, Title Case)}
+\title{NMCleaner: Provides sets of simplified tools to clean and analyse NMC data.}
 \description{
-Assist NMC users to conduct standardised data analysis.
+Assist NMC users to conduct standardised data management, wrangling and analysis of NMC data. The package is designed to ingest raw NMC data form the linelist export function on the NMC web-based application. The package include sample data [`sample'] aswell as shape files for administration boundaries and collated Mid-Year-Population-Estimates.
 }
 \author{
-\strong{Maintainer}: Brian Brummer \email{first.last@example.com} (\href{https://orcid.org/YOUR-ORCID-ID}{ORCID})
+\strong{Maintainer}: Brian Brummer \email{brianb@nicd.ac.za} (\href{https://orcid.org/0000-0003-4626-416X}{ORCID})
 
 }
 \keyword{internal}

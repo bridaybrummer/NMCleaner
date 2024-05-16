@@ -2,7 +2,6 @@
 output: github_document
 ---
 
-<!-- README.md is generated from README.Rmd. Please edit that file -->
 
 ```{r setup, include = FALSE}
 knitr::opts_chunk$set(
@@ -63,28 +62,28 @@ The package will constantly be in development, cleaning practices will seldom ch
 Use [`bind_linelist()`] to produce a [`data.frame'] from the directory that contains the .xlsx files downlaoded form the NMC. 
 
 ```{r, evaluate = FALSE}
-dirty_dataframe <- bind_linelist("path/to/linelist/folder")
+#library(NMCleaner)
+#dirty_dataframe <- bind_linelist("path/to/linelist/folder")
 ```
 
 
 Use [`stata2script()`] to produce the cleaned data. The return object is a list of other datafrmes which shows the duplicates that were removed. 
 
 ```{r evaluate = FALSE}
-clean<- stata2script(dirty_dataframe)
+#clean<- stata2script(dirty_dataframe)
 # the clean object also returns the list of notificatiosn that were taken out because of duplication
-
-clean_df<- clean$data_dup33
+#clean_df<- clean$data_dup33
 ```
 
-You cano now reproduce 
+
 ```{r, evaluate = FALSE}
 
-clean_df<- clean$data_dup33%>%
-  selet(case_definition, condition) %>%
-  tbl_summary(by = case_defintiion)
+#clean_df<- clean$data_dup33%>%
+#  selet(case_definition, condition) %>%
+#  tbl_summary(by = case_defintiion)
 
 
 ```
 
 
-### Clean the NMC linelist
+# Conclusion
