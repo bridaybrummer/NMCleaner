@@ -5,7 +5,7 @@
 #' @return Returns the "category 1 at a glance table"
 #' @export
 #'
-#' @examples
+#' @examples flextable<- at_a_glance(clean_df)
 at_a_glance<- function(data){
 cat_1<-  data%>%
   filter(nmccategories ==1)%>%select(condition) %>% unique %>%pull

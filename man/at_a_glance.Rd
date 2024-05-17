@@ -15,3 +15,6 @@ Returns the "category 1 at a glance table"
 \description{
 Categry at a glance
 }
+\examples{
+flextable<- at_a_glance(clean_df)
+}
