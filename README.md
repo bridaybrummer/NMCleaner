@@ -43,7 +43,7 @@ it from your device.
 
 The {NMCleaner} package is based off of the cleaning **.do** files
 compiled by Mabore Morifi and Lehlohonolo Chandu; As such, the main
-cleaning function is called [`stata2script()`].
+cleaning function is called \[`stata2script()`\].
 
 The aim of the package is three-fold, 1) to make the transition to R
 easy for a busy epidemiologist. 2) To standardise cleaning practices
@@ -67,7 +67,7 @@ and other common outputs for sitrep or academic outputs.
 
 ### Bind .xlsx files from the NMC linelist export
 
-Use [`bind_linelist()`] to produce a [`data.frame’] from the
+Use \[`bind_linelist()`\] to produce a \[\`data.frame’\] from the
 directory that contains the .xlsx files downlaoded form the NMC.
 
 ``` r
@@ -75,7 +75,7 @@ directory that contains the .xlsx files downlaoded form the NMC.
 #dirty_dataframe <- bind_linelist("path/to/linelist/folder")
 ```
 
-Use [`stata2script()`] to produce the cleaned data. The return object
+Use \[`stata2script()`\] to produce the cleaned data. The return object
 is a list of other datafrmes which shows the duplicates that were
 removed.
 
@@ -85,24 +85,13 @@ removed.
 #clean_df<- clean$data_dup33
 ```
 
+### You could use a function that leaverages gtsummary for a quick table
+
 ``` r
 
 #clean_df<- clean$data_dup33%>%
-#  selet(case_definition, condition) %>%
-#  tbl_summary(by = case_defintiion)
+
+#clean_df %>%  at_a_glance()
 ```
 
-# Upcoming functions
-
--   [`epicurve()`] - A function that will produce an epicurve from the
-    cleaned data. You can specify the nesting level of the epicurve like Microsoft excel does. 
-    
--   [`epitable()`] - A function that will produce an epitable from the fed data by CDC standard epiweek. 
-
--  [`anonymise()`] - A function that will take away all personal identifiers from the data, in the event you need to share data.
-
--  [`get_population()`] - A function that will return the population of a given province, district or subdistrict.
-
--  [`map()`] - A function that will map the given notifications a map to the sub-district level. 
-
-
+# Conclusion

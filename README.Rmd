@@ -24,14 +24,10 @@ The package is maintained by the NMC epidemiologist and we encourage you to cont
 
 You can install {NMCleaner} from github with:
 
-``` r
-remotes::install_github("bridaybrummer/gtsummary")
-```
-
-or
 
 ``` r
 if(!require("devtools")) install.packages("devtools")
+
 devtools::install_github("bridaybrummer/NMCleaner", force = TRUE)
 ```
 
