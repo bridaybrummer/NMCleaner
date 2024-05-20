@@ -4,15 +4,17 @@
 \alias{epicurve_df}
 \title{Epicurve dataframe}
 \usage{
-epicurve_df(data = data, date_index = date_index)
+epicurve_df(data = data, date_index = date_index, extra_group_by = NULL)
 }
 \arguments{
+\item{data}{a patient level data.frame or tibble with a date column. Does not upport ulti condition dataframes yet}
+
 \item{date_index}{the name of the date column in the dataframe (preferable in as_date() format)}
 
-\item{data.frame}{a dataframe with a date column}
+\item{extra_group_by}{default is NULL but can take another grouping variable such as lab confirmation or case_definition (If it exists in your df). To be passed to a fill argument in plot_epicruve_df()}
 }
 \value{
-a data.frame with the date, epiweek, month, year, lab, n, cumulative and day columns icluding zero reporting on all dates
+returns a data.frame with the date, epiweek, month, year, lab, n, cumulative and day columns including zero reporting on all dates
 }
 \description{
 This function takes a dataframe of patient level data and returns an aggregated data.frame by day including zero reporting.
@@ -20,6 +22,6 @@ This is suitable for plotting an epicurve with ggplot2 and nesting the dates. En
 done  scale_x_discrete and NOT scale_x_date. We recommend using plot_epicurve_df()
 }
 \examples{
-df_to_plot<- epicurve_df(patient_level_data = , date_index = "date")
+df_to_plot<- epicurve_df(patient_level_data = , date_index = "date", extra_group_by = "case_definition")
 
 }

@@ -5,16 +5,18 @@
 #' This is suitable for plotting an epicurve with ggplot2 and nesting the dates. Ensure that plotting the epicurve is
 #' done  scale_x_discrete and NOT scale_x_date. We recommend using plot_epicurve_df()
 #'
-#' @param data.frame a dataframe with a date column
+#' @param data a patient level data.frame or tibble with a date column. Does not upport ulti condition dataframes yet
 #' @param date_index the name of the date column in the dataframe (preferable in as_date() format)
+#' @param extra_group_by
+#' default is NULL but can take another grouping variable such as lab confirmation or case_definition (If it exists in your df). To be passed to a fill argument in plot_epicruve_df()
 #'
 #'
-#' @return a data.frame with the date, epiweek, month, year, lab, n, cumulative and day columns icluding zero reporting on all dates
+#' @return returns a data.frame with the date, epiweek, month, year, lab, n, cumulative and day columns including zero reporting on all dates
 #' @export
 #'
-#' @examples df_to_plot<- epicurve_df(patient_level_data = , date_index = "date")
+#' @examples df_to_plot<- epicurve_df(patient_level_data = , date_index = "date", extra_group_by = "case_definition")
 #'
-epicurve_df<- function( data = data, date_index = date_index ){
+epicurve_df<- function( data = data, date_index = date_index, extra_group_by = NULL ){
   # the goal of this function is to return a dataframe that can be used to plot an epicurve
   # crucially, it has every date in the range of data including zero counts so that it can be plotted.
   # it also takes a single date index and returns the relevant epiweek, month and years.
@@ -30,10 +32,12 @@ epicurve_df<- function( data = data, date_index = date_index ){
            epiweek = rep(dates %>%as_epiweek()%>%as.character()%>%gsub("\\d+-W", "", .)%>%as.integer(),2),
            month = rep(factor(as_yearmonth(dates)%>%as.character()%>%gsub("\\d+-", "", .), levels = month.abb),2),
            year = rep(epiyear(dates),2),
-           lab = factor(rep(c("Epi-Link only", "Confirmed"), each = length(dates), levels = c("Epi-Link only", "Confirmed"))
-           )
+           #lab = factor(rep(c("Epi-Link only", "Confirmed"), each = length(dates), levels = c("Epi-Link only", "Confirmed"))
+           #)
     )
 
+  standard_group_vars<- c("date", "epiweek", "month", "year")
+  group_vars<- c(standard_group_vars, extra_group_by)
 
   aggregated<- data%>%
     mutate(
@@ -42,7 +46,7 @@ epicurve_df<- function( data = data, date_index = date_index ){
       month = factor(as_yearmonth(date)%>%as.character()%>%gsub("\\d+-", "", .), levels = month.abb),
       year = epiyear(date),
     )%>%
-    group_by(date, epiweek, month, year, lab)%>%
+    group_by(across(all_of(c(group_vars))))%>%
     summarise(n = n(),
     )%>%ungroup()
 
@@ -51,14 +55,14 @@ epicurve_df<- function( data = data, date_index = date_index ){
   df<-
     epicurve_template%>%left_join(.,
                                   aggregated ,
-                                  by = c("date", "epiweek", "month", "year", "lab")
+                                  by = c("date", "epiweek", "month", "year", extra_group_by)
     ) %>%
     mutate( n = if_else(is.na(n), 0, n),
-            lab = factor(lab, levels = c("Epi-Link only", "Confirmed")),
+            #lab = factor(lab, levels = c("Epi-Link only", "Confirmed")),
             epiweek  = as.factor(epiweek),
             day = as.factor(as.integer(format(date, "%d"))))%>%
     filter(month %in% month.abb[4:7] )%>%
-    group_by(lab) %>%
+    group_by(across(all_of(extra_group_by))) %>%
     mutate( cumulative = cumsum(n))%>%
     ungroup()
 
