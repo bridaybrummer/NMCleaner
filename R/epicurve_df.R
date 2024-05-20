@@ -1,12 +1,14 @@
 #' Epicurve dataframe
 #'
-#' @param data.frame a dataframe with a date column
-#' @param date_index the name of the date column in the dataframe (preferable in as_date() format)
 #'
-#' @details
 #' This function takes a dataframe of patient level data and returns an aggregated data.frame by day including zero reporting.
 #' This is suitable for plotting an epicurve with ggplot2 and nesting the dates. Ensure that plotting the epicurve is
 #' done  scale_x_discrete and NOT scale_x_date. We recommend using plot_epicurve_df()
+#'
+#' @param data.frame a dataframe with a date column
+#' @param date_index the name of the date column in the dataframe (preferable in as_date() format)
+#'
+#'
 #' @return a data.frame with the date, epiweek, month, year, lab, n, cumulative and day columns icluding zero reporting on all dates
 #' @export
 #'
