@@ -36,6 +36,12 @@ epicurve_df<- function( data = data, date_index = date_index ){
 
 
   aggregated<- data%>%
+    mutate(
+      date = as_date(data[[date_index]]),
+      epiweek =  date %>%as_epiweek%>%as.character()%>%gsub("\\d+-W", "", .)%>%as.integer(),
+      month = factor(as_yearmonth(date)%>%as.character()%>%gsub("\\d+-", "", .), levels = month.abb),
+      year = epiyear(date),
+    )%>%
     group_by(date, epiweek, month, year, lab)%>%
     summarise(n = n(),
     )%>%ungroup()
