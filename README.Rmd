@@ -81,4 +81,6 @@ Use [`stata2script()`] to produce the cleaned data. The return object is a list 
 ```
 
 
-# Conclusion
+# Future Plans
+
+We would like to add more helper functions to the package, such as `epicurve()` and `epitable()` functions. We would also like to add a function that can produce a sitrep from the cleaned data.
