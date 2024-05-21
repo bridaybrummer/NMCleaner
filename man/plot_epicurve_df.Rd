@@ -9,6 +9,7 @@ plot_epicurve_df(
   x_axis_option = x_axis_option,
   n_x_axis_breaks = 10,
   n_y_axis_breaks = 10,
+  add_rolling_avg = c(TRUE, 7),
   color_select = NULL
 )
 }
@@ -16,6 +17,16 @@ plot_epicurve_df(
 \item{data}{a dataframe that has been processed by the epicurve_df() function}
 
 \item{x_axis_option}{a string that can be one of the following: "epiweek", "day_month_year", "month_year" The string is evaluated wiht a jarowinkler score enabling ingestion of arguments with small errors.}
+
+\item{n_x_axis_breaks}{an integer that sets the number of breaks on the x axis. default is 10}
+
+\item{n_y_axis_breaks}{an integer that sets the number of breaks on the y axis. default is 10}
+
+\item{add_rolling_avg}{a logical vector that sets whether to add a rolling average to the epicurve.
+The second element is the number of days to average over. default is c(TRUE,7)
+The number of days used is maintained for the different x_axis options but summed for the groupping variable.
+The confidence interval is also summed.
+The rolling avergge is implemented with a confidence intervals using a poisson distribution.}
 
 \item{color_select}{a string color options. default is "firebrick"}
 

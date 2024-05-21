@@ -4,6 +4,13 @@
 #' @param x_axis_option a string that can be one of the following: "epiweek", "day_month_year", "month_year" The string is evaluated wiht a jarowinkler score enabling ingestion of arguments with small errors.
 #' @param color_select a string color options. default is "firebrick"
 #' @param fill_var Currenlty unavailable. Planned to take a string that can be used to fill the bars of the epicurve. default is NULL.
+#' @param n_x_axis_breaks an integer that sets the number of breaks on the x axis. default is 10
+#' @param n_y_axis_breaks an integer that sets the number of breaks on the y axis. default is 10
+#' @param add_rolling_avg a logical vector that sets whether to add a rolling average to the epicurve.
+#' The second element is the number of days to average over. default is c(TRUE,7)
+#' The number of days used is maintained for the different x_axis options but summed for the groupping variable.
+#' The confidence interval is also summed.
+#' The rolling avergge is implemented with a confidence intervals using a poisson distribution.
 #'
 #'
 #' @return returns a ggplot object
@@ -21,6 +28,7 @@ plot_epicurve_df<- function(data = data,
                             x_axis_option =x_axis_option,
                             n_x_axis_breaks = 10,
                             n_y_axis_breaks = 10,
+                            add_rolling_avg = c(TRUE,7),
                             #fill_var = NULL, for now, no fill_var can be selected. This should be allowed for atelast case definitions or other.
                             # for the fill var you will need to have pallettes that choose the amount of palettes to use based on the length of levels
                             color_select = NULL ){
@@ -58,6 +66,21 @@ plot_epicurve_df<- function(data = data,
 
   }
 
+  data<- data%>%
+    ungroup()%>%
+    mutate(
+      roll_avg = zoo::rollmean(n, add_rolling_avg[2], fill = NA, align = "right"),
+      # add CI for rollmean
+      #ci_upper = zoo::rollapply(n, add_rolling_ave[2], function(x) t.test(x)$conf.int, fill = NA, align = "right")[,1],
+      #ci_lower = zoo::rollapply(n, add_rolling_ave[2], function(x) t.test(x)$conf.int, fill = NA, align = "right")[,2]
+
+      # these are better as they use a poisson distributions for the count data in geenrating the CI
+      ci_upper = zoo::rollapply(n, width = add_rolling_avg[2], function(x) poisson.test(sum(x), T = length(x))$conf.int, fill = NA, align = "right")[,1],
+      ci_lower = zoo::rollapply(n, width = add_rolling_avg[2], function(x) poisson.test(sum(x), T = length(x))$conf.int, fill = NA, align = "right")[,2]
+    )%>%
+    mutate(across(where(is.numeric), ~ifelse( is.na(.) , 0, as.numeric(.))))%>%
+    tibble%>%
+    ungroup()
   # create breaks_for_plot based on the axis option
 
 
@@ -67,12 +90,18 @@ plot_epicurve_df<- function(data = data,
     x_2nd_level <- "year"
     x_3rd_level <- NULL
 
-    data1<-data %>%
-      group_by(!!sym(x_1st_level), !!sym(x_2nd_level) )%>%
-      summarise(n = sum(n)) %>%
-      ungroup() %>%
-      mutate(cumulative = cumsum(n))%>%
-      ungroup()
+    data1<- data%>% group_by(
+      !!sym(x_2nd_level),
+      !!sym(x_1st_level))%>%
+
+      summarise( n= sum(n, na.rm = TRUE),
+                 roll_avg = sum(roll_avg, na.rm = TRUE),
+                 ci_upper = sum(ci_upper, na.rm = TRUE),
+                 ci_lower = sum(ci_lower, na.rm = TRUE)
+      )%>%
+      ungroup()%>%
+      mutate(cumulative = cumsum(n))
+
 
 
     x_breaks_for_plot =  pretty(seq(min(as.numeric(as.character(data1[[x_1st_level]]))),  max(as.numeric(as.character(data1[[x_1st_level]])))), n = n_x_axis_breaks)
@@ -85,8 +114,17 @@ plot_epicurve_df<- function(data = data,
     x_2nd_level <- "month"
     x_3rd_level <- "year"
 
-    data1<- data%>% # this is already the most granular
-      ungroup()
+    data1<- data%>% group_by(!!sym(x_3rd_level),
+                             !!sym(x_2nd_level),
+                             !!sym(x_1st_level))%>%
+
+      summarise( n= sum(n, na.rm = TRUE),
+                 roll_avg = sum(roll_avg, na.rm = TRUE),
+                 ci_upper = sum(ci_upper, na.rm = TRUE),
+                 ci_lower = sum(ci_lower, na.rm = TRUE)
+      )%>%
+      ungroup()%>%
+      mutate(cumulative = cumsum(n))
 
 
     x_breaks_for_plot =  pretty(seq(min(as.numeric(as.character(data1[[x_1st_level]]))),  max(as.numeric(as.character(data1[[x_1st_level]])))), n = n_x_axis_breaks)
@@ -99,11 +137,17 @@ plot_epicurve_df<- function(data = data,
     x_3rd_level <- NULL
 
     data1<-data %>%
-      group_by(!!sym(x_1st_level), !!sym(x_2nd_level) )%>%
-      summarise(n = sum(n))%>%
-      ungroup() %>%
-      mutate(cumulative = cumsum(n))%>%
-      ungroup()
+      data1<- data%>% group_by(
+        !!sym(x_2nd_level),
+        !!sym(x_1st_level))%>%
+
+      summarise( n= sum(n, na.rm = TRUE),
+                 roll_avg = sum(roll_avg, na.rm = TRUE),
+                 ci_upper = sum(ci_upper, na.rm = TRUE),
+                 ci_lower = sum(ci_lower, na.rm = TRUE)
+      )%>%
+      ungroup()%>%
+      mutate(cumulative = cumsum(n))
 
     # need a way to specify the number of breaks for the x axis when it is a character date.
     # maybe convert to numeric and then back to date?
@@ -115,7 +159,7 @@ plot_epicurve_df<- function(data = data,
     stop(paste0(stop_message))
   }
 
-  print(paste0(x_1st_level, x_2nd_level, x_3rd_level))
+  print(paste0("You selected levels: ",x_1st_level, x_2nd_level, x_3rd_level))
 
   #data <- data %>%
   #  group_by(vars)
@@ -130,7 +174,7 @@ plot_epicurve_df<- function(data = data,
 
   # need to adjust the x axis for the x axis option you choose.
 
-  max_cases <- ceiling(max((data1$n)*1.1, na.rm = TRUE))
+  max_cases <- ceiling(max((data1$n)*1.5, na.rm = TRUE))
   max_cum_cases <- floor(max((data1$cumulative)*1.1, na.rm = TRUE))
   number_axes <- 10
   primary_by_axes <- ceiling(max_cases/number_axes)
@@ -182,8 +226,28 @@ plot_epicurve_df<- function(data = data,
       #x= day,
       y = n ,
       fill = ""),
-      stat = "identity",#c("darkolivegreen")
-    )+
+      stat = "identity",
+    )
+
+  if(add_rolling_avg[1] == TRUE){
+    print(paste0("Adding Line"))
+
+    plot<- plot +
+      geom_line(aes(x = !!sym(x_1st_level),
+                    y = roll_avg,
+                    group = 1), color = "grey10")+
+      geom_ribbon(aes(x = !!sym(x_1st_level),
+                      ymin = ci_upper,
+                      ymax = ci_lower,
+                      group = 1), # group = 1 is crucial for the line to actually show
+                  fill = "grey80",
+                  color = "grey10",
+                  size= 0.1,
+                  alpha = 0.25)
+
+  }
+
+  plot<- plot+
     scale_fill_manual(values = fill_select)+
     # maybe add to plot a smoothed line or rolling average?
     # plot the cumulative line
@@ -201,14 +265,14 @@ plot_epicurve_df<- function(data = data,
     breaks = x_breaks_for_plot, #find the breaks_for_plot
     expand = c(0,0))+
     #include secondary axis for cumulative line
-    scale_y_continuous(breaks = seq(0, max_cases, primary_by_axes),#seq(0,breaks_ref*1.1, round((breaks_ref/10),0)),
-                       expand = c(0,0),
-                       limits = c(0, max_cases),
-                       # sec.axis = sec_axis(~.*seccy_axis,
-                       #                     name="Second Axis",
-                       #                     breaks = seq(0, max_cum_cases, secondary_by_axes),
-                       #limits = c(0, max_cum_cases)
-                       #)
+    scale_y_continuous(#breaks = seq(0, max_cases, primary_by_axes),#seq(0,breaks_ref*1.1, round((breaks_ref/10),0)),
+      expand = c(0,0),
+      #limits = c(0, max_cases),
+      # sec.axis = sec_axis(~.*seccy_axis,
+      #                     name="Second Axis",
+      #                     breaks = seq(0, max_cum_cases, secondary_by_axes),
+      #limits = c(0, max_cum_cases)
+      #)
     )
 
   if (!is.null(x_3rd_level)) {
@@ -259,7 +323,7 @@ plot_epicurve_df<- function(data = data,
       #strip.text.x = ggplot2::element_text(size = 9, angle=90)
     )
 
-
+  print(data1)
   return(plot)
 
 }
