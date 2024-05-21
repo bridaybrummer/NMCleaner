@@ -9,11 +9,18 @@
 #' @return returns a ggplot object
 #' @export
 #'
-#' @examples df_to_plot<- epicurve_df(patient_level_data = , date_index = "date", extra_group_by = "case_definition")
+#' @examples
+#' df_to_plot<- epicurve_df(patient_level_data = ,
+#'                          date_index = "date",
+#'                          extra_group_by = "case_definition",
+#'                          n_axis_breaks = 10 ) # 10 is set as default but you may change this #for the month_year options, all months are shown by default.
+#'                          n_y_axis_breaks = 10 ) # 10 is set as default but you may change this
 #' plot_epicurve_df(data = df_to_plot, x_axis_option = "day_month_year", color_select = "red")
 #'
 plot_epicurve_df<- function(data = data,
                             x_axis_option =x_axis_option,
+                            n_x_axis_breaks = 10,
+                            n_y_axis_breaks = 10,
                             #fill_var = NULL, for now, no fill_var can be selected. This should be allowed for atelast case definitions or other.
                             # for the fill var you will need to have pallettes that choose the amount of palettes to use based on the length of levels
                             color_select = NULL ){
@@ -51,11 +58,26 @@ plot_epicurve_df<- function(data = data,
 
   }
 
+  # create breaks_for_plot based on the axis option
+
+
   if(x_axis_option == "epiweek"){
 
     x_1st_level <- "epiweek"
     x_2nd_level <- "year"
     x_3rd_level <- NULL
+
+    data1<-data %>%
+      group_by(!!sym(x_1st_level), !!sym(x_2nd_level) )%>%
+      summarise(n = sum(n)) %>%
+      ungroup() %>%
+      mutate(cumulative = cumsum(n))%>%
+      ungroup()
+
+
+    x_breaks_for_plot =  pretty(seq(min(as.numeric(as.character(data1[[x_1st_level]]))),  max(as.numeric(as.character(data1[[x_1st_level]])))), n = n_x_axis_breaks)
+    # the x_breaks_for_plot could technically go outside of the function, but it cant be selected correctly
+    # for the epiweek option since they are character dates and not numbers.
 
   }else if(x_axis_option == "day_month_year"){
 
@@ -63,17 +85,40 @@ plot_epicurve_df<- function(data = data,
     x_2nd_level <- "month"
     x_3rd_level <- "year"
 
+    data1<- data%>% # this is already the most granular
+      ungroup()
+
+
+    x_breaks_for_plot =  pretty(seq(min(as.numeric(as.character(data1[[x_1st_level]]))),  max(as.numeric(as.character(data1[[x_1st_level]])))), n = n_x_axis_breaks)
+
+
   }else if(x_axis_option == "month_year"){
 
     x_1st_level <- "month"
     x_2nd_level <- "year"
     x_3rd_level <- NULL
 
+    data1<-data %>%
+      group_by(!!sym(x_1st_level), !!sym(x_2nd_level) )%>%
+      summarise(n = sum(n))%>%
+      ungroup() %>%
+      mutate(cumulative = cumsum(n))%>%
+      ungroup()
+
+    # need a way to specify the number of breaks for the x axis when it is a character date.
+    # maybe convert to numeric and then back to date?
+
+    x_breaks_for_plot =  month.abb[ month.abb %in% unique(data1[[x_1st_level]])]
+
+
   }else{
     stop(paste0(stop_message))
   }
 
   print(paste0(x_1st_level, x_2nd_level, x_3rd_level))
+
+  #data <- data %>%
+  #  group_by(vars)
 
   # Function to do list
   ## We are going to recreate the first epicurve wiht the function
@@ -82,29 +127,18 @@ plot_epicurve_df<- function(data = data,
   ## then add the themes and facet_nested
   ## Then add the strip font changing.
 
-  # create breaks_for_plot based on the axis option
-  if (x_axis_option == "day_month_year"){
-    breaks_for_plot = seq(1, 31, by = 2)
 
-  }else if(x_axis_option == "epiweek"){
-    breaks_for_plot = seq(1, 52, by = 3)
+  # need to adjust the x axis for the x axis option you choose.
 
-  }else if(x_axis_option == "month_year"){
-    breaks_for_plot = seq(1, 12, by = 1)
-
-  }
-
-
-
-  max_cases <- ceiling(max((data$n)*1.1))
-  max_cum_cases <- floor(max((data$cumulative)*1.1))
+  max_cases <- ceiling(max((data1$n)*1.1, na.rm = TRUE))
+  max_cum_cases <- floor(max((data1$cumulative)*1.1, na.rm = TRUE))
   number_axes <- 10
   primary_by_axes <- ceiling(max_cases/number_axes)
   secondary_by_axes <- ceiling(max_cum_cases/number_axes)
   seccy_axis<- floor(max_cum_cases/max_cases)
 
   if( !is.null(x_3rd_level)){
-    combo <- data |>
+    combo <- data1 |>
       distinct(!!sym(x_3rd_level), !!sym(x_2nd_level), !!sym(x_1st_level)) |>
       arrange(!!sym(x_3rd_level), !!sym(x_2nd_level))
 
@@ -130,7 +164,7 @@ plot_epicurve_df<- function(data = data,
   #color_select <- "blue"
   default_function_color<- "firebrick"
 
-  blue_palette<- c()
+  blue_palette<- c() #remember these will be for colour fills for fill variable that you could add for lab_type or case_definition etc.
   red_pallette<- c()
 
   if(is.null(fill_var)){
@@ -141,7 +175,7 @@ plot_epicurve_df<- function(data = data,
     fill_select <- sym(fill_var)
   }
 
-  plot<- data  %>%
+  plot<- data1  %>%
     ggplot(.,
            aes(x = !! sym(x_1st_level) ))+
     geom_bar(   aes(
@@ -164,10 +198,10 @@ plot_epicurve_df<- function(data = data,
     #)+
 
   scale_x_discrete(
-    breaks = breaks_for_plot, #find the breaks_for_plot
+    breaks = x_breaks_for_plot, #find the breaks_for_plot
     expand = c(0,0))+
     #include secondary axis for cumulative line
-    scale_y_continuous(breaks = seq(0, max_cases, by_axes),#seq(0,breaks_ref*1.1, round((breaks_ref/10),0)),
+    scale_y_continuous(breaks = seq(0, max_cases, primary_by_axes),#seq(0,breaks_ref*1.1, round((breaks_ref/10),0)),
                        expand = c(0,0),
                        limits = c(0, max_cases),
                        # sec.axis = sec_axis(~.*seccy_axis,
