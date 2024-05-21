@@ -7,6 +7,8 @@
 plot_epicurve_df(
   data = data,
   x_axis_option = x_axis_option,
+  n_x_axis_breaks = 10,
+  n_y_axis_breaks = 10,
   color_select = NULL
 )
 }
@@ -26,7 +28,11 @@ returns a ggplot object
 Plots a simple epicurve with options from the epicurve_df() function.
 }
 \examples{
-df_to_plot<- epicurve_df(patient_level_data = , date_index = "date", extra_group_by = "case_definition")
+df_to_plot<- epicurve_df(patient_level_data = ,
+                         date_index = "date",
+                         extra_group_by = "case_definition",
+                         n_axis_breaks = 10 ) # 10 is set as default but you may change this #for the month_year options, all months are shown by default.
+                         n_y_axis_breaks = 10 ) # 10 is set as default but you may change this
 plot_epicurve_df(data = df_to_plot, x_axis_option = "day_month_year", color_select = "red")
 
 }
