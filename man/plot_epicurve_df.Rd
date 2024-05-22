@@ -10,6 +10,7 @@ plot_epicurve_df(
   n_x_axis_breaks = 10,
   n_y_axis_breaks = 10,
   add_rolling_avg = c(TRUE, 7),
+  grouping_vars = NULL,
   color_select = NULL
 )
 }
@@ -28,6 +29,8 @@ The number of days used is maintained for the different x_axis options but summe
 The confidence interval is also summed.
 The rolling avergge is implemented with a confidence intervals using a poisson distribution.}
 
+\item{grouping_vars}{a character vector that sets the grouping variables for the epicurve. default is NULL}
+
 \item{color_select}{a string color options. default is "firebrick"}
 
 \item{fill_var}{Currenlty unavailable. Planned to take a string that can be used to fill the bars of the epicurve. default is NULL.}
@@ -42,8 +45,11 @@ Plots a simple epicurve with options from the epicurve_df() function.
 df_to_plot<- epicurve_df(patient_level_data = ,
                          date_index = "date",
                          extra_group_by = "case_definition",
-                         n_axis_breaks = 10 ) # 10 is set as default but you may change this #for the month_year options, all months are shown by default.
-                         n_y_axis_breaks = 10 ) # 10 is set as default but you may change this
+                         n_axis_breaks = 10 , # 10 is set as default but you may change this #for the month_year options, all months are shown by default.
+                         n_y_axis_breaks = 10 , # 10 is set as default but you may change this
+                         add_rolling_avg = c(TRUE,7), # 7 is set as default but you may change this
+                         grouping_vars = NULL # NULL is standard, recommended to be condition or case_definition, currenlty supports facet_grid
+
 plot_epicurve_df(data = df_to_plot, x_axis_option = "day_month_year", color_select = "red")
 
 }
