@@ -24,7 +24,9 @@
 #'                          n_axis_breaks = 10 , # 10 is set as default but you may change this #for the month_year options, all months are shown by default.
 #'                          n_y_axis_breaks = 10 , # 10 is set as default but you may change this
 #'                          add_rolling_avg = c(TRUE,7), # 7 is set as default but you may change this
-#'                          grouping_vars = NULL # NULL is standard, recommended to be condition or case_definition, currenlty supports facet_grid
+#'                          add_bar = TRUE # TRUE is set as default, if FALSE then the bars are not shown
+#'                          grouping_vars = NULL # Null is standar. If groupin specifed it automaticlly facets by the grouping variable. An option for filling by the goruping variable is being worked on.
+#'
 #'
 #' output<- plot_epicurve_df(data = df_to_plot, x_axis_option = "day_month_year", color_select = "red")
 #'
@@ -37,6 +39,7 @@ plot_epicurve_df<- function(data = data,
                             n_y_axis_breaks = 10,
                             add_rolling_avg = c(TRUE,7),
                             grouping_vars = NULL,
+                            add_bar = TRUE,
                             #fill_var = NULL, for now, no fill_var can be selected. This should be allowed for atelast case definitions or other.
                             # for the fill var you will need to have pallettes that choose the amount of palettes to use based on the length of levels
                             color_select = NULL ){
@@ -236,13 +239,17 @@ plot_epicurve_df<- function(data = data,
 
   plot<- data1  %>%
     ggplot(.,
-           aes(x = !! sym(x_1st_level) ))+
-    geom_bar(   aes(
-      #x= day,
-      y = n ,
-      fill = ""),
-      stat = "identity",
-    )
+           aes(x = !! sym(x_1st_level) ))
+
+  if(add_bar == TRUE ){
+    plot<- plot+
+      geom_bar(   aes(
+        #x= day,
+        y = n ,
+        fill = ""),
+        stat = "identity",
+      )
+  }
 
   if(add_rolling_avg[1] == TRUE){
     print(paste0("Adding Line"))
@@ -282,14 +289,14 @@ plot_epicurve_df<- function(data = data,
     if (!is.null(x_3rd_level)) {
       plot <- plot + facet_nested(cols = vars( !!sym(x_3rd_level), !!sym(x_2nd_level)),
                                   rows = vars(!!sym(grouping_vars)),
-                                  scales = "fixed",# other options include "free_x", "free_y", "free", "fixed"
+                                  scales = "free_y",# other options include "free_x", "free_y", "free", "fixed"
                                   switch = "x")
 
 
     } else if(is.null(x_3rd_level)){
       plot <- plot + facet_nested(cols = vars(!!sym(x_2nd_level)),
                                   rows = vars(!!sym(grouping_vars)),
-                                  scales = "fixed",
+                                  scales = "free_y",
                                   switch = "x")
     }
 
@@ -298,14 +305,14 @@ plot_epicurve_df<- function(data = data,
     if (!is.null(x_3rd_level)) {
       plot <- plot + facet_nested(cols = vars( !!sym(x_3rd_level), !!sym(x_2nd_level)),
                                   #rows = vars(!!sym(grouping_vars)),
-                                  scales = "fixed",# other options include "free_x", "free_y", "free", "fixed"
+                                  scales = "free_y",# other options include "free_x", "free_y", "free", "fixed"
                                   switch = "x")
 
 
     } else if(is.null(x_3rd_level)){
       plot <- plot + facet_nested(cols = vars(!!sym(x_2nd_level)),
                                   #rows = vars(!!sym(grouping_vars)),
-                                  scales = "fixed",
+                                  scales = "free_y",
                                   switch = "x")
 
     }
@@ -318,7 +325,7 @@ plot_epicurve_df<- function(data = data,
       expand = c(0,0))+
     #include secondary axis for cumulative line
     scale_y_continuous(#breaks = seq(0, max_cases, primary_by_axes),#seq(0,breaks_ref*1.1, round((breaks_ref/10),0)),
-      expand = c(0,0),
+      expand = c(0.1,0),
       #limits = c(0, max_cases),
       # sec.axis = sec_axis(~.*seccy_axis,
       #                     name="Second Axis",
@@ -358,6 +365,7 @@ plot_epicurve_df<- function(data = data,
       axis.ticks = element_line(size = 0.15, color = "grey20"),
       legend.background = element_rect(fill = "#F8F8F8", size = 0.25, linetype = "solid", colour = "grey50"),
       #strip.text.x = ggplot2::element_text(size = 9, angle=90)
+      strip.text.y.right = element_text(angle = 0)
     )
 
   print(data1)

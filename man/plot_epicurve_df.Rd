@@ -11,6 +11,7 @@ plot_epicurve_df(
   n_y_axis_breaks = 10,
   add_rolling_avg = c(TRUE, 7),
   grouping_vars = NULL,
+  add_bar = TRUE,
   color_select = NULL
 )
 }
@@ -49,7 +50,9 @@ df_to_plot<- epicurve_df(patient_level_data = ,
                          n_axis_breaks = 10 , # 10 is set as default but you may change this #for the month_year options, all months are shown by default.
                          n_y_axis_breaks = 10 , # 10 is set as default but you may change this
                          add_rolling_avg = c(TRUE,7), # 7 is set as default but you may change this
-                         grouping_vars = NULL # NULL is standard, recommended to be condition or case_definition, currenlty supports facet_grid
+                         add_bar = TRUE # TRUE is set as default, if FALSE then the bars are not shown
+                         grouping_vars = NULL # Null is standar. If groupin specifed it automaticlly facets by the grouping variable. An option for filling by the goruping variable is being worked on.
+
 
 output<- plot_epicurve_df(data = df_to_plot, x_axis_option = "day_month_year", color_select = "red")
 
