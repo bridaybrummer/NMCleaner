@@ -84,7 +84,8 @@ plot_epicurve_df<- function(data = data,
         ci_lower = zoo::rollapply(n, width = add_rolling_avg[2], function(x) poisson.test(sum(x), T = length(x))$conf.int, fill = NA, align = "right")[,2]
       )%>%
       mutate(across(where(is.numeric), ~ifelse( is.na(.) , 0, as.numeric(.))))%>%
-      tibble
+      tibble%>%
+      ungroup()
     # create breaks_for_plot based on the axis option
 
 
