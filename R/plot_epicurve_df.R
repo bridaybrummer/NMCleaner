@@ -105,6 +105,7 @@ plot_epicurve_df<- function(data = data,
                    ci_lower = sum(ci_lower, na.rm = TRUE)
         )%>%
         ungroup()%>%
+        group_by(across(all_of(grouping_vars)))%?%
         mutate(cumulative = cumsum(n))
 
 
@@ -131,6 +132,7 @@ plot_epicurve_df<- function(data = data,
                    ci_lower = sum(ci_lower, na.rm = TRUE)
         )%>%
         ungroup()%>%
+        group_by(across(all_of(grouping_vars)))%?%
         mutate(cumulative = cumsum(n))
 
 
@@ -155,6 +157,7 @@ plot_epicurve_df<- function(data = data,
                    ci_lower = sum(ci_lower, na.rm = TRUE)
         )%>%
         ungroup()%>%
+        group_by(across(all_of(grouping_vars)))%?%
         mutate(cumulative = cumsum(n))
 
       # need a way to specify the number of breaks for the x axis when it is a character date.
