@@ -61,7 +61,7 @@ epicurve_df<- function( data = data, date_index = date_index, extra_group_by = N
             #lab = factor(lab, levels = c("Epi-Link only", "Confirmed")),
             epiweek  = as.factor(epiweek),
             day = as.factor(as.integer(format(date, "%d"))))%>%
-    filter(month %in% month.abb[4:7] )%>%
+    filter(month %in% month.abb )%>% # something needs to be done here to reference the aggregated data min and max month dates.
     group_by(across(all_of(extra_group_by))) %>%
     mutate( cumulative = cumsum(n))%>%
     ungroup()

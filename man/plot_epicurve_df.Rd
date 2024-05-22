@@ -51,6 +51,9 @@ df_to_plot<- epicurve_df(patient_level_data = ,
                          add_rolling_avg = c(TRUE,7), # 7 is set as default but you may change this
                          grouping_vars = NULL # NULL is standard, recommended to be condition or case_definition, currenlty supports facet_grid
 
-plot_epicurve_df(data = df_to_plot, x_axis_option = "day_month_year", color_select = "red")
+output<- plot_epicurve_df(data = df_to_plot, x_axis_option = "day_month_year", color_select = "red")
+
+output$plot # the plot.
+output#data # raw data used to plot
 
 }
