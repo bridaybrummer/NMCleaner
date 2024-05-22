@@ -12,6 +12,7 @@
 #' The confidence interval is also summed.
 #' The rolling avergge is implemented with a confidence intervals using a poisson distribution.
 #' @param grouping_vars a character vector that sets the grouping variables for the epicurve. default is NULL
+#' It is advised to use some kind of faceting function if using grouping_vars argument
 #'
 #' @return returns a ggplot object
 #' @export

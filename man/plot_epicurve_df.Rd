@@ -29,7 +29,8 @@ The number of days used is maintained for the different x_axis options but summe
 The confidence interval is also summed.
 The rolling avergge is implemented with a confidence intervals using a poisson distribution.}
 
-\item{grouping_vars}{a character vector that sets the grouping variables for the epicurve. default is NULL}
+\item{grouping_vars}{a character vector that sets the grouping variables for the epicurve. default is NULL
+It is advised to use some kind of faceting function if using grouping_vars argument}
 
 \item{color_select}{a string color options. default is "firebrick"}
 
