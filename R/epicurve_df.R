@@ -1,6 +1,5 @@
 #' Epicurve dataframe
 #'
-#'
 #' This function takes a dataframe of patient level data and returns an aggregated data.frame by day including zero reporting.
 #' This is suitable for plotting an epicurve with ggplot2 and nesting the dates. Ensure that plotting the epicurve is
 #' done  scale_x_discrete and NOT scale_x_date. We recommend using plot_epicurve_df()
@@ -26,6 +25,9 @@ epicurve_df<- function( data = data,
   # it also takes a single date index and returns the relevant epiweek, month and years.
 
   # ensure date_index is in
+
+  # put this function in just in case.
+
 
   data[[date_index]] <- as_date(data[[date_index]])
 
