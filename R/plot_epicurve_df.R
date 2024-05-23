@@ -7,12 +7,8 @@
 #' @param n_x_axis_breaks an integer that sets the number of breaks on the x axis. default is 10
 #' @param n_y_axis_breaks an integer that sets the number of breaks on the y axis. default is 10
 #' @param add_rolling_avg a logical vector that sets whether to add a rolling average to the epicurve.
-#' The second element is the number of days to average over. default is c(TRUE,7)
-#' The number of days used is maintained for the different x_axis options but summed for the groupping variable.
-#' The confidence interval is also summed.
-#' The rolling avergge is implemented with a confidence intervals using a poisson distribution.
-#' @param grouping_vars a character vector that sets the grouping variables for the epicurve. default is NULL
-#' It is advised to use some kind of faceting function if using grouping_vars argument
+#' @param add_bar a logical vector that sets whether to add bars to the epicurve. default is TRUE
+#' @param color_select a string that sets the color of the epicurve. default is "firebrick"
 #'
 #' @return returns a ggplot object
 #' @export
@@ -38,7 +34,7 @@ plot_epicurve_df<- function(data = data,
                             n_x_axis_breaks = 10,
                             n_y_axis_breaks = 10,
                             add_rolling_avg = c(TRUE,7),
-                            grouping_vars = NULL,
+                            #grouping_vars = NULL,
                             add_bar = TRUE,
                             #fill_var = NULL, for now, no fill_var can be selected. This should be allowed for atelast case definitions or other.
                             # for the fill var you will need to have pallettes that choose the amount of palettes to use based on the length of levels
@@ -77,23 +73,9 @@ plot_epicurve_df<- function(data = data,
 
   }
 
-  data<- data%>%
-    group_by(across(all_of(grouping_vars)))%>%
-    mutate(
-      roll_avg = zoo::rollmean(n, add_rolling_avg[2], fill = NA, align = "right"),
-      # add CI for rollmean
-      #ci_upper = zoo::rollapply(n, add_rolling_avg[2], function(x) t.test(x)$conf.int, fill = NA, align = "right")[,1],
-      #ci_lower = zoo::rollapply(n, add_rolling_avg[2], function(x) t.test(x)$conf.int, fill = NA, align = "right")[,2]
-
-      # these are better as they use a poisson distributions for the count data in geenrating the CI
-      ci_upper = zoo::rollapply(n, width = add_rolling_avg[2], function(x) poisson.test(sum(x), T = length(x))$conf.int, fill = NA, align = "right")[,1],
-      ci_lower = zoo::rollapply(n, width = add_rolling_avg[2], function(x) poisson.test(sum(x), T = length(x))$conf.int, fill = NA, align = "right")[,2]
-    )%>%
-    mutate(across(where(is.numeric), ~ifelse( is.na(.) , 0, as.numeric(.))))%>%
-    tibble%>%
-    ungroup()
   # create breaks_for_plot based on the axis option
 
+  data<- data %>%ungroup()
 
   if(x_axis_option == "epiweek"){
 
@@ -144,6 +126,11 @@ plot_epicurve_df<- function(data = data,
 
 
     x_breaks_for_plot =  pretty(seq(min(as.numeric(as.character(data1[[x_1st_level]]))),  max(as.numeric(as.character(data1[[x_1st_level]])))), n = n_x_axis_breaks)
+    #  mutate_dates(., date_index = "date")%>%
+    #  select(day ) %>%
+    #  pull()
+
+    #x_breaks_for_plot =  pretty(axis_string , n = n_x_axis_breaks)
 
 
   }else if(x_axis_option == "month_year"){
@@ -153,9 +140,9 @@ plot_epicurve_df<- function(data = data,
     x_3rd_level <- NULL
     x_label <- "Month of Notification"
 
-    data1<- data%>% group_by(across(all_of(c(grouping_vars,
-                                             x_2nd_level,
-                                             x_1st_level
+    data%>% group_by(across(all_of(c(grouping_vars,
+                                     x_2nd_level,
+                                     x_1st_level
     ))))%>%
 
       summarise( n= sum(n, na.rm = TRUE),
@@ -166,6 +153,7 @@ plot_epicurve_df<- function(data = data,
       ungroup()%>%
       mutate(cumulative = cumsum(n))
 
+    data1<- data%>%ungroup()
     # need a way to specify the number of breaks for the x axis when it is a character date.
     # maybe convert to numeric and then back to date?
 
@@ -177,6 +165,8 @@ plot_epicurve_df<- function(data = data,
   }
 
   print(paste0("You selected levels: ",x_1st_level, x_2nd_level, x_3rd_level))
+
+  print(data1)
 
   #data <- data %>%
   #  group_by(vars)
@@ -257,7 +247,8 @@ plot_epicurve_df<- function(data = data,
     plot<- plot +
       geom_line(aes(x = !!sym(x_1st_level),
                     y = roll_avg,
-                    group = 1), color = "grey10")+
+                    group = 1),
+                color = "grey10")+
       geom_ribbon(aes(x = !!sym(x_1st_level),
                       ymin = ci_upper,
                       ymax = ci_lower,
