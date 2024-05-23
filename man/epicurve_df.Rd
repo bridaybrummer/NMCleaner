@@ -2,7 +2,7 @@
 % Please edit documentation in R/epicurve_df.R, R/epicurve_df1.R
 \name{epicurve_df}
 \alias{epicurve_df}
-\title{Epicurve dataframe}
+\title{Title: Epicurve dataframe}
 \usage{
 epicurve_df(
   data = data,
@@ -35,15 +35,13 @@ returns a data.frame with the date, epiweek, month, year, lab, n, cumulative and
 \description{
 This function takes a dataframe of patient level data and returns an aggregated data.frame by day including zero reporting.
 This is suitable for plotting an epicurve with ggplot2 and nesting the dates. Ensure that plotting the epicurve is
-done  scale_x_discrete and NOT scale_x_date. We recommend using plot_epicurve_df()
+done  scale_x_discrete and NOT scale_x_date. We recommend using
 
 This function takes a dataframe of patient level data and returns an aggregated data.frame by day including zero reporting.
 This is suitable for plotting an epicurve with ggplot2 and nesting the dates. Ensure that plotting the epicurve is
 done  scale_x_discrete and NOT scale_x_date. We recommend using plot_epicurve_df()
 }
 \details{
-This function is also reliant on the create_date_template funcction from this package
-
 This function is also reliant on the create_date_template funcction from this package
 }
 \examples{

@@ -1,20 +1,18 @@
-#' Epicurve dataframe
+#' Title: Epicurve dataframe
 #'
-#' This function takes a dataframe of patient level data and returns an aggregated data.frame by day including zero reporting.
-#' This is suitable for plotting an epicurve with ggplot2 and nesting the dates. Ensure that plotting the epicurve is
-#' done  scale_x_discrete and NOT scale_x_date. We recommend using plot_epicurve_df()
-#'
-#' This function is also reliant on the create_date_template funcction from this package
+#'  This function takes a dataframe of patient level data and returns an aggregated data.frame by day including zero reporting.
+#'  This is suitable for plotting an epicurve with ggplot2 and nesting the dates. Ensure that plotting the epicurve is
+#'  done  scale_x_discrete and NOT scale_x_date. We recommend using
 #'
 #' @param data a patient level data.frame or tibble with a date column. Does not upport ulti condition dataframes yet
-#' @param date_index the name of the date column in the dataframe (preferable in as_date() format)
-#' @param grouping_vars
-#' default is NULL but can take another grouping variable such as lab confirmation or case_definition (If it exists in your df). To be passed to a fill argument in plot_epicruve_df()
+#' @param date_index the name of the date column in the dataframe which should be a lubridate object or in the format YYYY-MM-DD
+#' @param grouping_vars default is NULL but can take another grouping variable such as lab confirmation or case_definition (If it exists in your df). To be passed to a fill argument in plot_epicruve_df()
 #' @param add_rolling_avg a logical vector of length 2. The first element is whether to add a rolling average to the epicurve and the second element is the window size for the rolling average
 #' @return returns a data.frame with the date, epiweek, month, year, lab, n, cumulative and day columns including zero reporting on all dates
 #' @export
 #'
-#' @examples df_to_plot<- epicurve_df(patient_level_data = , date_index = "date", extra_group_by = "case_definition")
+#' @examples
+#' df_to_plot<- epicurve_df(patient_level_data = , date_index = "date", extra_group_by = "case_definition")
 #'
 epicurve_df<- function( data = data,
                          date_index = date_index,
