@@ -28,7 +28,7 @@ A tibble of date columns for all dates in a given time period
 }
 \description{
 This fucntion takes argumetns of dat dimensions and extra varibales and creates a template of dates
-with the specified dimensions. It can be used to \code{left_join()} aggregate data to create a full dataset
+with the specified dimensions. It can be used to left_join aggregate data to create a full dataset
 that includes zero reporting. Future plans also include a date_standardize function that will create the necessary
 dates for a given dataset using the date_index so that joining datasets is easy.
 }
