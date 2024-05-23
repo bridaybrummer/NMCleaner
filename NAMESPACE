@@ -3,7 +3,7 @@
 export(at_a_glance)
 export(bind_linelist)
 export(clean_labels)
-export(epicurve_df)
+export(create_date_template)
 export(plot_epicurve_df)
 export(stata2script)
 export(trim_tbl)
