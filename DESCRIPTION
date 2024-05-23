@@ -21,6 +21,7 @@ Depends:
     dplyr,
     flextable,
     forcats,
+    fuzzyjoin,
     ggh4x,
     ggplot2,
     grates,
@@ -33,6 +34,8 @@ Depends:
     R (>= 2.10),
     readxl,
     sf,
+    stringdist,
+    stringr,
     tidyverse,
     tinytex
 LazyData: true
