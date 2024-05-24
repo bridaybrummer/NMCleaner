@@ -18,6 +18,7 @@ RoxygenNote: 7.3.1
 Imports: 
     glue
 Depends: 
+    conflicted,
     dplyr,
     flextable,
     forcats,
@@ -37,5 +38,6 @@ Depends:
     stringdist,
     stringr,
     tidyverse,
-    tinytex
+    tinytex,
+    zoo
 LazyData: true
