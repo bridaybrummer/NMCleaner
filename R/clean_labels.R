@@ -7,10 +7,10 @@
 #'
 #' @examples add it as a pip fucntion at the end of your tbl_summary pipeline
 clean_labels <- function(gt_summary_object) {
-  gt_summary_object$table_body$label <- gt_summary_object$table_body$label %>%
+  gt_summary_object[["table_body"]][["labels"]] <- gt_summary_object[["table_body"]][["labels"]] %>%
     gsub("_", " ", .) %>%
     str_to_title()
-  return(tbl)
+  return(gt_summary_object)
 }
 
 

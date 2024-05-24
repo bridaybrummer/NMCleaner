@@ -33,11 +33,23 @@ epicurve_df<- function( data = data,
 
   dates<- seq.Date(floor_date(min(data[[date_index]]), "month"), ceiling_date(max(data[[date_index]]), "month"), by = "day")
 
+  if (!is.null(grouping_vars)){
+
+
   grouping_vars_length <- data[[grouping_vars]]%>%unique() %>%length # will have to do a few of these if ther are more grouping vars.
 
   epicurve_template<-
     tibble(
       !!grouping_vars := rep(data[[grouping_vars]] %>%unique(), each = length(dates)),
+    )
+  }else{
+    epicurve_template<-
+      tibble(
+      )
+  }
+
+  epicurve_template<- epicurve_template%>%
+    mutate(
       year = rep(epiyear(dates),grouping_vars_length),
       month = rep(factor(as_yearmonth(dates)%>%as.character()%>%gsub("\\d+-", "", .), levels = month.abb),grouping_vars_length),
       epiweek = rep(dates %>%as_epiweek()%>%as.character()%>%gsub("\\d+-W", "", .)%>%as.integer(),grouping_vars_length),
