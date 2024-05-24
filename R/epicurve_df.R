@@ -2,7 +2,9 @@
 #'
 #'  This function takes a dataframe of patient level data and returns an aggregated data.frame by day including zero reporting.
 #'  This is suitable for plotting an epicurve with ggplot2 and nesting the dates. Ensure that plotting the epicurve is
-#'  done  scale_x_discrete and NOT scale_x_date. We recommend using
+#'  done  scale_x_discrete and NOT scale_x_date. We recommend using the plot_epicurve_df() function to plot the epicurve
+#'
+#'  The function currently cannot accept the grouping_vars == NULL argument, so rather use conditions if it sa single condition.
 #'
 #' @param data a patient level data.frame or tibble with a date column. Does not upport ulti condition dataframes yet
 #' @param date_index the name of the date column in the dataframe which should be a lubridate object or in the format YYYY-MM-DD
@@ -51,7 +53,7 @@ epicurve_df<- function( data = data,
   aggregated<- data%>%
 
     mutate(
-      date = as_date(conditions_df[[date_index]]))%>%
+      date = as_date(data[[date_index]]))%>%
     mutate(
       epiweek =  date %>%as_epiweek%>%as.character()%>%gsub("\\d+-W", "", .)%>%as.integer(),
       month = factor(as_yearmonth(date)%>%as.character()%>%gsub("\\d+-", "", .), levels = month.abb),
