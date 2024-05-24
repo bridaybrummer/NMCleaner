@@ -10,7 +10,7 @@ test()
 check()
 # so when making a package ensure you, load_all, document(), also use_package() and use_import()
 
-
+use_r("epicurve_df.R")
 usethis::use_import_from("flextable","readxl")
 usethis::use_import_from("glue")
 
