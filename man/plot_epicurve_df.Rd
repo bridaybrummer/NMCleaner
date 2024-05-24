@@ -10,7 +10,9 @@ plot_epicurve_df(
   n_x_axis_breaks = 10,
   n_y_axis_breaks = 10,
   add_rolling_avg = c(TRUE, 7),
+  grouping_vars = NULL,
   add_bar = TRUE,
+  axis_text_size = 6,
   color_select = NULL
 )
 }
@@ -25,7 +27,11 @@ plot_epicurve_df(
 
 \item{add_rolling_avg}{a logical vector that sets whether to add a rolling average to the epicurve.}
 
+\item{grouping_vars}{a string that sets the grouping variable for the epicurve. default is NULL}
+
 \item{add_bar}{a logical vector that sets whether to add bars to the epicurve. default is TRUE}
+
+\item{axis_text_size}{an integer that sets the size of the axis text. default is 6}
 
 \item{color_select}{a string that sets the color of the epicurve. default is "firebrick"}
 

@@ -7,7 +7,12 @@
 bind_linelist(directory)
 }
 \arguments{
-\item{directory}{}
+\item{directory}{a string character denoting the directory where the linelist is stored
+This function will find all .xlsx files stored in a directory or folder. Note that the directory is the name of the folder where the.xlsx files are stored and NOT the name of the .xlsx file itself.
+The function converte the read in .xlsx file all to character to ensure all data can be bound together.
+type.convert is then implemented for appropriate type conversion however it is not perfect and may need to be adjusted.
+
+We recommend that the output is then fed into stata2script()}
 }
 \value{
 a tibble
@@ -16,5 +21,5 @@ a tibble
 bind_linelist
 }
 \examples{
-not much
+bind_linelist("database/linelist")
 }

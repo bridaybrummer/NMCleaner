@@ -26,7 +26,10 @@ returns a data.frame with the date, epiweek, month, year, lab, n, cumulative and
 \description{
 This function takes a dataframe of patient level data and returns an aggregated data.frame by day including zero reporting.
 This is suitable for plotting an epicurve with ggplot2 and nesting the dates. Ensure that plotting the epicurve is
-done  scale_x_discrete and NOT scale_x_date. We recommend using
+done  scale_x_discrete and NOT scale_x_date. We recommend using the plot_epicurve_df() function to plot the epicurve
+}
+\details{
+The function currently cannot accept the grouping_vars == NULL argument, so rather use conditions if it sa single condition.
 }
 \examples{
 df_to_plot<- epicurve_df(patient_level_data = , date_index = "date", extra_group_by = "case_definition")
