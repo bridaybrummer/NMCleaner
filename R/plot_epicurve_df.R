@@ -9,7 +9,8 @@
 #' @param add_rolling_avg a logical vector that sets whether to add a rolling average to the epicurve.
 #' @param add_bar a logical vector that sets whether to add bars to the epicurve. default is TRUE
 #' @param color_select a string that sets the color of the epicurve. default is "firebrick"
-#'
+#' @param grouping_vars a string that sets the grouping variable for the epicurve. default is NULL
+#' @param axis_text_size an integer that sets the size of the axis text. default is 6
 #' @return returns a ggplot object
 #' @export
 #'
@@ -34,8 +35,9 @@ plot_epicurve_df<- function(data = data,
                             n_x_axis_breaks = 10,
                             n_y_axis_breaks = 10,
                             add_rolling_avg = c(TRUE,7),
-                            #grouping_vars = NULL,
+                            grouping_vars = NULL,
                             add_bar = TRUE,
+                            axis_text_size = 6,
                             #fill_var = NULL, for now, no fill_var can be selected. This should be allowed for atelast case definitions or other.
                             # for the fill var you will need to have pallettes that choose the amount of palettes to use based on the length of levels
                             color_select = NULL ){
@@ -350,6 +352,7 @@ plot_epicurve_df<- function(data = data,
       legend.title.align = 0.5,
       panel.grid.major = element_blank(),
       axis.text.x = element_text(angle = 30, size = 6),
+      axis.text.y = element_text(size = 6, color = "#666666"),
       axis.title = element_text(size = 10, color = "#666666"),
       panel.grid.minor.x =element_blank(),
       panel.grid.minor.y = element_blank(),
