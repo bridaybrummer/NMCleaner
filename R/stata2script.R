@@ -1,4 +1,5 @@
 #' Cleans NMC data for reporting
+#'  This can return the dataframe fo the duplcaited that were removed but it has been turned off to save time in the function runtime.
 #'
 #' @param NMC a tibble
 #' @param verbose a logical
