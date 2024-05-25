@@ -41,3 +41,6 @@ Depends:
     tinytex,
     zoo
 LazyData: true
+Suggests: 
+    rmarkdown
+VignetteBuilder: knitr

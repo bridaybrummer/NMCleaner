@@ -12,6 +12,7 @@ This function will find all .xlsx files stored in a directory or folder. Note th
 The function converte the read in .xlsx file all to character to ensure all data can be bound together.
 type.convert is then implemented for appropriate type conversion however it is not perfect and may need to be adjusted.
 
+Please note, the directory name is added as a column to the data.frame. This is useful for tracking the source of the data.
 We recommend that the output is then fed into stata2script()}
 }
 \value{
