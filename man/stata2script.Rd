@@ -2,7 +2,8 @@
 % Please edit documentation in R/stata2script.R
 \name{stata2script}
 \alias{stata2script}
-\title{Cleans NMC data for reporting}
+\title{Cleans NMC data for reporting
+This can return the dataframe fo the duplcaited that were removed but it has been turned off to save time in the function runtime.}
 \usage{
 stata2script(NMC, verbose = T)
 }
@@ -16,6 +17,7 @@ a tibble
 }
 \description{
 Cleans NMC data for reporting
+This can return the dataframe fo the duplcaited that were removed but it has been turned off to save time in the function runtime.
 }
 \examples{
 some example
