@@ -1253,10 +1253,14 @@ data_dup32%>% nrow() %>%print()
 
 tabyl_of_duplicates<- data23%>%tabyl(condition, dup_number, dat = .)
 print(tabyl_of_duplicates)
-df_of_duplicates <- data23%>%filter(duplicate %in% "duplicate")
+
+#df_of_duplicates <- data23%>%filter(duplicate %in% "duplicate")
 
 
-return(list(data_dup33 = data_dup33, tabyl_of_duplicates = tabyl_of_duplicates, df_of_duplicates = df_of_duplicates))
+return(list(data_dup33 = data_dup33, tabyl_of_duplicates = tabyl_of_duplicates#,
+            #df_of_duplicates = df_of_duplicates
+            )
+            )
 }
 
 
