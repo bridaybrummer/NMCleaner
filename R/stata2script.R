@@ -505,21 +505,43 @@ data23 <- data22 %>%
   ungroup()
 
 tabyl_of_duplicates<- data23%>%tabyl(condition, dup_number, dat = .)
-print(tabyl_of_duplicates)
-df_of_duplicates <- data23%>%filter(duplicate %in% "duplicate")
 
-data_dup <- data23 %>%
-  filter(dup_number == 1)
+
+print(tabyl_of_duplicates)
+
+#df_of_duplicates <- data23%>%filter(duplicate %in% "duplicate")
+
+#data_dup <- data23 %>%
+#  filter(dup_number == 1)
 # n = 105 - some of these are different patients with the same NMC CaseID number - cannot just drop duplicates - extract for reporting purposes
-nrow(data_dup)
+#nrow(data_dup)
+
+
+
+
+library(data.table)
+dup_tagged_dt <- as.data.table(data23)
+
+# Convert to a lazy_dt data table
+dup_tagged_lazy <- lazy_dt(dup_tagged_dt)
+
+# Use dplyr functions to filter
+library(dtplyr)
+df_of_singles <- dup_tagged_lazy %>%
+  dplyr::filter(dup_number == 1) %>%
+  as.data.table()  # Convert back to data.table if needed
+
+
+df_of_duplicates <- dup_tagged_dt%>%
+  filter(duplicate %in% "duplicate")
 
 # find a way to identify duplciates by condition and name/surname,
 # and
 # duplicates of people with different conditions.
 
 # Calling direct duplicates
-names(data_dup)
-data_dup2 <- data_dup %>%
+names(df_of_singles)
+data_dup2 <- df_of_singles %>%
   arrange(condition, case_type, epidemiological_classification, facility, patient_name, patient_surname, gender, patient_dob) %>%
   group_by(condition, case_type, epidemiological_classification, facility, patient_name, patient_surname, gender, patient_dob) %>%
   mutate(duplicate = ifelse(n() > 1, "duplicate", "unique"),
