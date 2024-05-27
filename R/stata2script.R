@@ -2,6 +2,7 @@
 #'  This can return the dataframe fo the duplcaited that were removed but it has been turned off to save time in the function runtime.
 #'
 #' @param NMC a tibble
+#' @param deduplicate_complete a logical input, if FALSE, no deduplication  will run. Recomennded that if running large datasets, deduplcaition is runoutside of the function,
 #' @param verbose a logical
 #'
 #' @return a tibble
@@ -15,7 +16,7 @@
 #' @import stringr
 #'
 #' @examples some example
-stata2script<- function(NMC, verbose = T){
+stata2script<- function(NMC, deduplicate_complete = FALSE ,verbose = T){
 
 
   names(NMC) <- str_to_lower(names(NMC))
@@ -506,8 +507,17 @@ data23 <- data22 %>%
 
 tabyl_of_duplicates<- data23%>%tabyl(condition, dup_number, dat = .)
 
-
 print(tabyl_of_duplicates)
+
+print(paste0("Pre-function"))
+
+
+# deduplicate_complete argument ----
+
+if(deduplicate_complete == FALSE){
+
+
+
 
 #df_of_duplicates <- data23%>%filter(duplicate %in% "duplicate")
 
@@ -515,8 +525,6 @@ print(tabyl_of_duplicates)
 #  filter(dup_number == 1)
 # n = 105 - some of these are different patients with the same NMC CaseID number - cannot just drop duplicates - extract for reporting purposes
 #nrow(data_dup)
-
-
 
 
 library(data.table)
@@ -558,8 +566,8 @@ data_dup3 <- data_dup3 %>%
 
 # Double-check that there are no cases that need manual linking before you drop
 # If you want to drop all duplicate observations but keep the first occurrence, use: data <- data %>% drop_duplicates()
-data_dup3 %>%
-  filter(dup_number == 1)
+#data_dup3 %>%
+#  filter(dup_number == 1)
 
 count(data_dup3)
 
@@ -790,6 +798,9 @@ data_dup18 %>%
 
 #write.csv(df, "March2023_afterdeduplication.csv", row.names = FALSE)
 
+}else{
+  data_dup18 <- data23
+}
 
 #library(dplyr)
 colSums(is.na(data_dup18))

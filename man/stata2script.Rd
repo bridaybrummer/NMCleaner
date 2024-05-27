@@ -5,10 +5,12 @@
 \title{Cleans NMC data for reporting
 This can return the dataframe fo the duplcaited that were removed but it has been turned off to save time in the function runtime.}
 \usage{
-stata2script(NMC, verbose = T)
+stata2script(NMC, deduplicate_complete = FALSE, verbose = T)
 }
 \arguments{
 \item{NMC}{a tibble}
+
+\item{deduplicate_complete}{a logical input, if FALSE, no deduplication  will run. Recomennded that if running large datasets, deduplcaition is runoutside of the function,}
 
 \item{verbose}{a logical}
 }
