@@ -798,9 +798,7 @@ data_dup18 %>%
 
 #write.csv(df, "March2023_afterdeduplication.csv", row.names = FALSE)
 
-}else{
-  data_dup18 <- data23
-}
+
 
 #library(dplyr)
 colSums(is.na(data_dup18))
@@ -820,6 +818,13 @@ data_dup18%>% filter(  !grepl("*Other", symptoms, ignore.case = T))
 data_dup18$symptoms%>%unique()
 data_dup18$case_type%>%unique
 data_dup18$epidemiological_classification%>%unique
+
+}else{
+  data_dup18 <- data23
+}
+
+print(paste0( "Post deduplicate_compelte argument"))
+
 
 data_dup19 <- data_dup18%>%
 mutate(case_type = case_when(
@@ -850,6 +855,7 @@ xtabs(~ case_type+ epidemiological_classification,  data_dup19, addNA = T)
 xtabs(~ case_type+ epidemiological_classification,  data_dup19, addNA = T)
 
 # Drop CS lab notification according to case_source
+print(paste0( "Drop CS lab notification according to case_source"))
 data_dup20 <- data_dup19 %>%
   filter(!(condition == "Congenital syphilis" & case_type == "Lab"))
 
@@ -857,9 +863,10 @@ data_dup20 <- data_dup19 %>%
 data_dup20 %>% nrow() %>%print()
 
 # Drop cases of Congenital syphilis above age 2
+print(paste0( "Drop cases of Congenital syphilis above age 2"))
+
 data_dup21 <- data_dup20 %>%
   filter(!(condition == "Congenital syphilis" & patient_age > 2))
-
 
 
 data_dup21 %>% nrow() %>%print()
@@ -876,9 +883,10 @@ count(data_dup21)
 xtabs(~ case_type+diagnosis_method, data = malaria)
 nrow(malaria)
 
-
+#Drop malaria notificaitons accoridn gto maxwell SOP
+print(paste0( "Drop malaria notificaitons accoring to maxwell SOP"))
 data_dup22 <- data_dup21 %>%
-  filter(!(condition == "Malaria" & diagnosis_method == "Clinical signs and symptoms ONLY|Other" & is.na(episode_number)))
+  filter(!(condition == "Malaria" & diagnosis_method == "Clinical signs and symptoms ONLY|Other|X-ray|Rapid test" & is.na(episode_number)))
 
 data_dup22 %>% nrow() %>%print()
 
