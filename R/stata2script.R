@@ -870,8 +870,8 @@ count(data_dup21)
 #library(dplyr)
 
 # Malaria notifications
-malaria <- data_dup21%>%
-  filter(condition == "Malaria")
+#malaria <- data_dup21%>%
+#  filter(condition == "Malaria")
 
 xtabs(~ case_type+diagnosis_method, data = malaria)
 nrow(malaria)

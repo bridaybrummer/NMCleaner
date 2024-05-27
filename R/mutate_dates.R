@@ -37,6 +37,8 @@ mutate_dates<- function(data, date_index){
   #run functions to get date in correct format, try with year first or day first, try with excel and stats date formats
   # TO DO
   ## could try make an argument that give a pre_fix or suffix to the date variables for instance, year_notification and so on
+  standard_group_vars<- c("year", "month", "epiweek", "date")
+
   data <- data %>%
     mutate(date = as_date(data[[date_index]]))%>%
     mutate(
