@@ -533,18 +533,24 @@ library(data.table)
 
 # Use dplyr functions to filter
 library(dtplyr)
-  lazy_dt_tagged <- lazy_dt_data23 %>%
+
+lazy_dt_tagged <- lazy_dt_data23 %>%
   group_by(case_id, condition) %>%
   mutate(duplicate = ifelse(n() > 1, "duplicate", "unique"),
-         dup_number = row_number())
+         dup_number = row_number()
+         )%>%
+             ungroup()
 
-  df_of_singles<- lazy_dt_tagged %>%
+df_of_singles<- lazy_dt_tagged %>%
   dplyr::filter(dup_number == 1) %>%
-  as.data.table()  # Convert back to data.table if needed
+  as.data.table() %>% # Convert back to data.table if needed
 
+  ungroup()
 
 df_of_duplicates <- lazy_dt_tagged%>%
-  filter(duplicate %in% "duplicate")
+  filter(duplicate %in% "duplicate")%>%
+
+  ungroup
 
 # find a way to identify duplciates by condition and name/surname,
 # and
@@ -826,7 +832,7 @@ data_dup18$epidemiological_classification%>%unique
   data_dup18 <- data23
 }
 
-print(paste0( "Post deduplicate_compelte argument"))
+print(paste0( "Post deduplicate_complete argument"))
 
 
 data_dup19 <- data_dup18%>%
@@ -1296,8 +1302,8 @@ xtabs(~ data_dup32$agecategory_unit)
 data_dup32%>% nrow() %>%print()
 
 
-tabyl_of_duplicates<- data23%>%tabyl(condition, dup_number, dat = .)
-print(tabyl_of_duplicates)
+#tabyl_of_duplicates<- data23%>%tabyl(condition, dup_number, dat = .)
+#print(tabyl_of_duplicates)
 
 #df_of_duplicates <- data23%>%filter(duplicate %in% "duplicate")
 
