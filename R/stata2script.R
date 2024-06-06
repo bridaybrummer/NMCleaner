@@ -539,8 +539,7 @@ if(deduplicate_complete == FALSE){
     group_by(case_id, condition) %>%
     mutate(duplicate = ifelse(n() > 1, "duplicate", "unique"),
            dup_number = row_number()) %>%
-    ungroup()%>%
-    as.data.table()
+    ungroup()
 
   df_of_singles <- tagged %>%
     dplyr::filter(dup_number == 1) %>%
