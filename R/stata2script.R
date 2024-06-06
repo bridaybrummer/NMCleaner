@@ -517,8 +517,6 @@ print(paste0("Pre-function"))
 if(deduplicate_complete == FALSE){
 
 
-
-
 #df_of_duplicates <- data23%>%filter(duplicate %in% "duplicate")
 
 #data_dup <- data23 %>%
@@ -528,19 +526,24 @@ if(deduplicate_complete == FALSE){
 
 
 library(data.table)
-dup_tagged_dt <- as.data.table(data23)
+  dt_data23 <- as.data.table(data23)
 
 # Convert to a lazy_dt data table
-dup_tagged_lazy <- lazy_dt(dup_tagged_dt)
+  lazy_dt_data23 <- lazy_dt(dt_data23)
 
 # Use dplyr functions to filter
 library(dtplyr)
-df_of_singles <- dup_tagged_lazy %>%
+  lazy_dt_tagged <- lazy_dt_data23 %>%
+  group_by(case_id, condition) %>%
+  mutate(duplicate = ifelse(n() > 1, "duplicate", "unique"),
+         dup_number = row_number())
+
+  df_of_singles<- lazy_dt_tagged %>%
   dplyr::filter(dup_number == 1) %>%
   as.data.table()  # Convert back to data.table if needed
 
 
-df_of_duplicates <- dup_tagged_dt%>%
+df_of_duplicates <- lazy_dt_tagged%>%
   filter(duplicate %in% "duplicate")
 
 # find a way to identify duplciates by condition and name/surname,
@@ -880,8 +883,8 @@ count(data_dup21)
 #malaria <- data_dup21%>%
 #  filter(condition == "Malaria")
 
-xtabs(~ case_type+diagnosis_method, data = malaria)
-nrow(malaria)
+#xtabs(~ case_type+diagnosis_method, data = malaria)
+#nrow(malaria)
 
 #Drop malaria notificaitons accoridn gto maxwell SOP
 print(paste0( "Drop malaria notificaitons accoring to maxwell SOP"))

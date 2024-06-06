@@ -48,15 +48,7 @@ epicurve_df<- function( data = data,
       )
   }
 
-  epicurve_template<- epicurve_template%>%
-    mutate(
-      year = rep(epiyear(dates),grouping_vars_length),
-      month = rep(factor(as_yearmonth(dates)%>%as.character()%>%gsub("\\d+-", "", .), levels = month.abb),grouping_vars_length),
-      epiweek = rep(dates %>%as_epiweek()%>%as.character()%>%gsub("\\d+-W", "", .)%>%as.integer(),grouping_vars_length),
-      date = rep(as_date(dates),grouping_vars_length),
-      #lab = factor(rep(c("Epi-Link only", "Confirmed"), each = length(dates), levels = c("Epi-Link only", "Confirmed"))
-      #)
-    )
+
 
   standard_group_vars<- c("year", "month", "epiweek", "date")
 
@@ -96,14 +88,14 @@ epicurve_df<- function( data = data,
 
     group_by(across(all_of(grouping_vars)))%>%
     mutate(
-      roll_avg = zoo::rollmean(n, add_rolling_avg[2], fill = NA, align = "right"),
+      roll_avg = zoo::rollmean(n, add_rolling_avg[2], fill = 0, align = "right"), # FILL CAN ALSO BE NA
       # add CI for rollmean
       #ci_upper = zoo::rollapply(n, add_rolling_avg[2], function(x) t.test(x)$conf.int, fill = NA, align = "right")[,1],
       #ci_lower = zoo::rollapply(n, add_rolling_avg[2], function(x) t.test(x)$conf.int, fill = NA, align = "right")[,2]
 
       # these are better as they use a poisson distributions for the count data in geenrating the CI
-      ci_upper = zoo::rollapply(n, width = add_rolling_avg[2], function(x) poisson.test(sum(x), T = length(x))$conf.int, fill = NA, align = "right")[,1],
-      ci_lower = zoo::rollapply(n, width = add_rolling_avg[2], function(x) poisson.test(sum(x), T = length(x))$conf.int, fill = NA, align = "right")[,2]
+      ci_upper = zoo::rollapply(n, width = add_rolling_avg[2], function(x) poisson.test(sum(x), T = length(x))$conf.int, fill = 0, align = "right")[,1],
+      ci_lower = zoo::rollapply(n, width = add_rolling_avg[2], function(x) poisson.test(sum(x), T = length(x))$conf.int, fill = 0, align = "right")[,2]
     )%>%ungroup()%>%
     mutate(across(where(is.numeric), ~ifelse( is.na(.) , 0, as.numeric(.))))%>%
     mutate( across( all_of( standard_group_vars), ~as.factor(.)))%>%
