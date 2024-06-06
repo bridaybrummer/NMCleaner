@@ -23,11 +23,16 @@ epicurve_df<- function( data = data,
   # the goal of this function is to return a dataframe that can be used to plot an epicurve
   # crucially, it has every date in the range of data including zero counts so that it can be plotted.
   # it also takes a single date index and returns the relevant epiweek, month and years.
-  conflicted::conflicts_prefer(grates::year)
+  conflicted::conflicts_prefer(grates::year, grates::isoweek)
   # ensure date_index is in
 
   # put this function in just in case.
 
+  ## for testing
+  #data<- new_master
+  #date_index<- "notification_date"
+  #grouping_vars<- "condition"
+  #add_rolling_avg<- c(TRUE, 7)
 
   data[[date_index]] <- as_date(data[[date_index]])
 
@@ -48,6 +53,10 @@ epicurve_df<- function( data = data,
       )
   }
 
+  epicurve_template<-create_date_template(min(dates), max(dates),
+                       reps = length(data[[grouping_vars]]%>%unique),
+                       rep_on_var = data[[grouping_vars]]%>%unique,
+                       rep_var_name = grouping_vars)
 
 
   standard_group_vars<- c("year", "month", "epiweek", "date")
@@ -59,16 +68,19 @@ epicurve_df<- function( data = data,
     mutate(
       date = as_date(data[[date_index]]))%>%
     mutate(
-      epiweek =  date %>%grates::as_epiweek%>%as.character()%>%gsub("\\d+-W", "", .)%>%as.integer(),
-      month = factor(grates::as_yearmonth(date)%>%as.character()%>%gsub("\\d+-", "", .), levels = month.abb),
-      'year' = lubridate::epiyear(date),
+      'epiweek' =  as.factor(date %>% grates::as_epiweek()%>%as.character()%>%gsub("\\d+-W", "", .)%>%as.integer()),
+      'month' = factor(grates::as_yearmonth(date)%>%as.character()%>%gsub("\\d+-", "", .), levels = month.abb),
+      'year' = as.factor(lubridate::epiyear(date)%>%as.integer()),
+      'date' = as.factor(date)
 
     )%>%
     group_by(across(all_of(c(group_vars ))))%>%
     summarise(n = n(),
     )%>%ungroup()
 
-
+  epicurve_template%>%
+    group_by(condition, month)%>%
+    summarise(n = n())
 
   df<-
     epicurve_template%>%left_join(.,
@@ -78,15 +90,15 @@ epicurve_df<- function( data = data,
     ungroup() %>%
     mutate( across(where(is.numeric), ~ifelse( is.na(.) , 0, as.numeric(.))),
             #lab = factor(lab, levels = c("Epi-Link only", "Confirmed")),
-            epiweek  = as.factor(epiweek),
-            day = as.factor(as.integer(format(date, "%d"))))%>%
+            'epiweek'  = as.factor(epiweek),
+            'day' = as.factor(as.integer(format(as_date(date), "%d")))
+            )%>%
     #filter(month %in% month.abb )%>%
     group_by(across(all_of(grouping_vars))) %>%
     mutate( cumulative = cumsum(n))%>%
     ungroup()%>%
-
-
     group_by(across(all_of(grouping_vars)))%>%
+    mutate(across(where(is.numeric), ~ifelse( is.na(.) , 0, as.numeric(.))))%>%
     mutate(
       roll_avg = zoo::rollmean(n, add_rolling_avg[2], fill = 0, align = "right"), # FILL CAN ALSO BE NA
       # add CI for rollmean

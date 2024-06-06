@@ -47,7 +47,7 @@ create_date_template<- function( start_date , end_date, reps = 1, rep_on_var = N
   data<- data%>%
     mutate(
       day = as.factor(as.integer(format(date, "%d"))),
-      epiweek =  date %>%grates::as_epiweek%>%as.character()%>%gsub("\\d+-W", "", .)%>%as.integer(),
+      epiweek =  date %>%grates::as_epiweek()%>%as.character()%>%gsub("\\d+-W", "", .)%>%as.integer(),
       month = factor(grates::as_yearmonth(date)%>%as.character()%>%gsub("\\d+-", "", .), levels = month.abb),
       'year' = lubridate::epiyear(date)
 
@@ -57,3 +57,5 @@ create_date_template<- function( start_date , end_date, reps = 1, rep_on_var = N
 
   return(data)
 }
+
+
