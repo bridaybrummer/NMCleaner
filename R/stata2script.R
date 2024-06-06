@@ -40,7 +40,7 @@ stata2script<- function(NMC, deduplicate_complete = FALSE ,verbose = T){
 
   NMC1$notification_date
 
-  NMC1$months<- as.character(as_yearmonth(as_date(NMC1$notification_date)))
+  NMC1$months<- as.character(grates::as_yearmonth(as_date(NMC1$notification_date)))
 
 
 NMC <- NMC1
@@ -533,9 +533,10 @@ print("deduplicate_compelte set to FALSE")
 
   # Convert to a lazy_dt data table
   #lazy_dt_data23 <- lazy_dt(dt_data23)
-
+  conflicted::conflicts_prefer(dplyr::filter)
   # Use dplyr functions to filter
   print("tagging dataset")
+
   tagged <- data23 %>%
     group_by(case_id, condition) %>%
     mutate(duplicate = ifelse(n() > 1, "duplicate", "unique"),
