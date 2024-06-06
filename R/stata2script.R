@@ -526,31 +526,34 @@ if(deduplicate_complete == FALSE){
 
 
 library(data.table)
+  library(data.table)
+  library(dplyr)
+  library(dtplyr)
+
+  # Assuming data23 is already defined
+
+  # Convert to a data.table
   dt_data23 <- as.data.table(data23)
 
-# Convert to a lazy_dt data table
+  # Convert to a lazy_dt data table
   lazy_dt_data23 <- lazy_dt(dt_data23)
 
-# Use dplyr functions to filter
-library(dtplyr)
+  # Use dplyr functions to filter
+  lazy_dt_tagged <- lazy_dt_data23 %>%
+    group_by(case_id, condition) %>%
+    mutate(duplicate = ifelse(n() > 1, "duplicate", "unique"),
+           dup_number = row_number()) %>%
+    ungroup()
 
-lazy_dt_tagged <- lazy_dt_data23 %>%
-  group_by(case_id, condition) %>%
-  mutate(duplicate = ifelse(n() > 1, "duplicate", "unique"),
-         dup_number = row_number()
-         )%>%
-             ungroup()
+  df_of_singles <- lazy_dt_tagged %>%
+    dplyr::filter(dup_number == 1) %>%
+    as.data.table() %>% # Convert back to data.table if needed
+    ungroup()
 
-df_of_singles<- lazy_dt_tagged %>%
-  dplyr::filter(dup_number == 1) %>%
-  as.data.table() %>% # Convert back to data.table if needed
-
-  ungroup()
-
-df_of_duplicates <- lazy_dt_tagged%>%
-  filter(duplicate %in% "duplicate")%>%
-
-  ungroup
+  df_of_duplicates <- lazy_dt_tagged %>%
+    dplyr::filter(duplicate == "duplicate") %>%
+    as.data.table() %>% # Convert back to data.table if needed
+    ungroup()
 
 # find a way to identify duplciates by condition and name/surname,
 # and
