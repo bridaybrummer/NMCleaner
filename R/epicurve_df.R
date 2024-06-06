@@ -23,7 +23,7 @@ epicurve_df<- function( data = data,
   # the goal of this function is to return a dataframe that can be used to plot an epicurve
   # crucially, it has every date in the range of data including zero counts so that it can be plotted.
   # it also takes a single date index and returns the relevant epiweek, month and years.
-
+  conflicted::conflicts_prefer(grates::year)
   # ensure date_index is in
 
   # put this function in just in case.
@@ -61,7 +61,7 @@ epicurve_df<- function( data = data,
     mutate(
       epiweek =  date %>%grates::as_epiweek%>%as.character()%>%gsub("\\d+-W", "", .)%>%as.integer(),
       month = factor(grates::as_yearmonth(date)%>%as.character()%>%gsub("\\d+-", "", .), levels = month.abb),
-      year = lubridate::epiyear(date),
+      'year' = lubridate::epiyear(date),
 
     )%>%
     group_by(across(all_of(c(group_vars ))))%>%

@@ -25,6 +25,8 @@
 #'
 create_date_template<- function( start_date , end_date, reps = 1, rep_on_var = NULL, rep_var_name =NULL) {
 
+  conflicted::conflicts_prefer(grates::year)
+
   standard_group_vars<- c("year", "month", "epiweek", "date")
 
   dates <- as_date(seq(as_date(start_date), as_date(end_date), by = "days"))
@@ -45,9 +47,9 @@ create_date_template<- function( start_date , end_date, reps = 1, rep_on_var = N
   data<- data%>%
     mutate(
       day = as.factor(as.integer(format(date, "%d"))),
-      epiweek =  date %>%as_epiweek%>%as.character()%>%gsub("\\d+-W", "", .)%>%as.integer(),
-      month = factor(as_yearmonth(date)%>%as.character()%>%gsub("\\d+-", "", .), levels = month.abb),
-      year = epiyear(date)
+      epiweek =  date %>%grates::as_epiweek%>%as.character()%>%gsub("\\d+-W", "", .)%>%as.integer(),
+      month = factor(grates::as_yearmonth(date)%>%as.character()%>%gsub("\\d+-", "", .), levels = month.abb),
+      'year' = lubridate::epiyear(date)
 
     )%>%
     mutate(across(all_of(standard_group_vars), as.factor))%>%

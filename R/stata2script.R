@@ -18,7 +18,7 @@
 #' @examples some example
 stata2script<- function(NMC, deduplicate_complete = FALSE ,verbose = T){
 
-
+  conflicted::conflicts_prefer(grates::year)
   names(NMC) <- str_to_lower(names(NMC))
 
   exclude_vars_early<-names(NMC)[c(1:17, 22:length(NMC))] # we are picking vars to exclude so we only chnage the opposite of those for the matching.

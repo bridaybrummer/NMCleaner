@@ -38,15 +38,15 @@ mutate_dates<- function(data, date_index){
   # TO DO
   ## could try make an argument that give a pre_fix or suffix to the date variables for instance, year_notification and so on
   standard_group_vars<- c("year", "month", "epiweek", "date")
-
+  conflicted::conflicts_prefer(grates::year)
   data <- data %>%
     mutate(date = as_date(data[[date_index]]))%>%
     mutate(
       day_name = as.factor( format(date, "%A") ),
       day = as.factor(as.integer(format(date, "%d"))),
-      epiweek =  date %>%as_epiweek%>%as.character()%>%gsub("\\d+-W", "", .)%>%as.integer(),
-      month = factor(as_yearmonth(date)%>%as.character()%>%gsub("\\d+-", "", .), levels = month.abb),
-      year = epiyear(date)
+      epiweek =  date %>%grates::as_epiweek%>%as.character()%>%gsub("\\d+-W", "", .)%>%as.integer(),
+      month = factor(grates::as_yearmonth(date)%>%as.character()%>%gsub("\\d+-", "", .), levels = month.abb),
+      'year' = lubridate::epiyear(date)
     )%>%
       mutate(across(all_of(standard_group_vars), as.factor))
 
