@@ -59,9 +59,9 @@ epicurve_df<- function( data = data,
     mutate(
       date = as_date(data[[date_index]]))%>%
     mutate(
-      epiweek =  date %>%as_epiweek%>%as.character()%>%gsub("\\d+-W", "", .)%>%as.integer(),
-      month = factor(as_yearmonth(date)%>%as.character()%>%gsub("\\d+-", "", .), levels = month.abb),
-      year = epiyear(date),
+      epiweek =  date %>%grates::as_epiweek%>%as.character()%>%gsub("\\d+-W", "", .)%>%as.integer(),
+      month = factor(grates::as_yearmonth(date)%>%as.character()%>%gsub("\\d+-", "", .), levels = month.abb),
+      year = lubridate::epiyear(date),
 
     )%>%
     group_by(across(all_of(c(group_vars ))))%>%
