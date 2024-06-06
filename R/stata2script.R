@@ -516,7 +516,7 @@ print(paste0("Pre-function"))
 
 if(deduplicate_complete == FALSE){
 
-
+print("deduplciate_compelte set to FALSE")
 #df_of_duplicates <- data23%>%filter(duplicate %in% "duplicate")
 
 #data_dup <- data23 %>%
@@ -535,17 +535,20 @@ if(deduplicate_complete == FALSE){
   #lazy_dt_data23 <- lazy_dt(dt_data23)
 
   # Use dplyr functions to filter
+  print("tagging dataset")
   tagged <- data23 %>%
     group_by(case_id, condition) %>%
     mutate(duplicate = ifelse(n() > 1, "duplicate", "unique"),
            dup_number = row_number()) %>%
     ungroup()
 
+  print("Create sinlges dataset")
   df_of_singles <- tagged %>%
     dplyr::filter(dup_number == 1) %>%
     #as.data.table() %>% # Convert back to data.table if needed
     ungroup()
 
+  print("Create duplicates dataset")
   df_of_duplicates <- tagged %>%
     dplyr::filter(duplicate == "duplicate") %>%
     #as.data.table() %>% # Convert back to data.table if needed
@@ -556,6 +559,9 @@ if(deduplicate_complete == FALSE){
 # duplicates of people with different conditions.
 
 # Calling direct duplicates
+
+  print("Detailed deduplcaition process started")
+
 names(df_of_singles)
 data_dup2 <- df_of_singles %>%
   arrange(condition, case_type, epidemiological_classification, facility, patient_name, patient_surname, gender, patient_dob) %>%
