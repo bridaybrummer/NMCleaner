@@ -602,7 +602,7 @@ data_dup4 <- data_dup3 %>%
          dup_number = row_number()) %>%
   ungroup()
 
-data_dup%>% nrow() %>%print()
+#data_dup%>% nrow() %>%print()
 print("data_dup")
 
 data_dup2%>% nrow() %>%print()
