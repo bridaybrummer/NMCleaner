@@ -516,7 +516,7 @@ print(paste0("Pre-function"))
 
 if(deduplicate_complete == FALSE){
 
-print("deduplciate_compelte set to FALSE")
+print("deduplicate_compelte set to FALSE")
 #df_of_duplicates <- data23%>%filter(duplicate %in% "duplicate")
 
 #data_dup <- data23 %>%
