@@ -8,7 +8,8 @@ epicurve_df(
   data = data,
   date_index = date_index,
   grouping_vars = NULL,
-  add_rolling_avg = c(TRUE, 7)
+  add_rolling_avg = c(TRUE, 7),
+  lag_size = 0
 )
 }
 \arguments{
@@ -19,6 +20,8 @@ epicurve_df(
 \item{grouping_vars}{default is NULL but can take another grouping variable such as lab confirmation or case_definition (If it exists in your df). To be passed to a fill argument in plot_epicruve_df()}
 
 \item{add_rolling_avg}{a logical vector of length 2. The first element is whether to add a rolling average to the epicurve and the second element is the window size for the rolling average}
+
+\item{lag_size}{lag the rolling average by this amount of days. Deaful is no lag}
 }
 \value{
 returns a data.frame with the date, epiweek, month, year, lab, n, cumulative and day columns including zero reporting on all dates

@@ -29,9 +29,12 @@ create_date_template<- function( start_date , end_date, reps = 1, rep_on_var = N
 
   standard_group_vars<- c("year", "month", "epiweek", "date")
 
+  #start_date<- "2023-12-20"
+  #end_date <- "2024-01-10"
+  #reps =1
   dates <- as_date(seq(as_date(start_date), as_date(end_date), by = "days"))
 
-  if(reps > 0){
+  if(reps > 1){
 
     data<-
       tibble(
@@ -44,6 +47,7 @@ create_date_template<- function( start_date , end_date, reps = 1, rep_on_var = N
         date = dates
       )
   }
+
   data<- data%>%
     mutate(
       day = as.factor(as.integer(format(date, "%d"))),

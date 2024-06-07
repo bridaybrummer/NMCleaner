@@ -13,14 +13,17 @@ to contact them [NMC Epidemiologist](mailto:brinb@nicd.ac.za)
 You can install {NMCleaner} from github with:
 
 ``` r
-remotes::install_github("bridaybrummer/gtsummary")
+devtools::install_github("bridaybrummer/NMCleaner", force = TRUE)
+library(NMCleaner)
 ```
 
-or
+if you have a personal access token, otherwise use:
 
 ``` r
 if(!require("devtools")) install.packages("devtools")
-devtools::install_github("bridaybrummer/NMCleaner", force = TRUE)
+
+devtools::install_git("https://github.com/bridaybrummer/NMCleaner.git", force = TRUE)
+library(NMCleaner)
 ```
 
 First time installation may take up to 5 minutes as the package has many
