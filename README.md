@@ -14,11 +14,15 @@ You can install {NMCleaner} from github with:
 
 ``` r
 if(!require("devtools")) install.packages("devtools")
-
+options(timeout = 500) #increase downlod time to avoid faiure
 devtools::install_github("bridaybrummer/NMCleaner", force = TRUE)
 ```
 
-First time installation may take up to 5 minutes as the package has many
+This package, in its infancy, is large. You must increase the default
+downlaod timeout from 60s `options(timeout = 500)` to avoid installation
+failure.
+
+First time installation may take a few minutes as the package has many
 dependancies to make way for implementing Epitable and Epicurve
 functions in the future.
 
