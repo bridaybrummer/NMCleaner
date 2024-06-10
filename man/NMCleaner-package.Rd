@@ -6,7 +6,14 @@
 \alias{NMCleaner-package}
 \title{NMCleaner: Provides sets of simplified tools to clean and analyse NMC data.}
 \description{
-Assist NMC users to conduct standardised data management, wrangling and analysis of NMC data. The package is designed to ingest raw NMC data form the linelist export function on the NMC web-based application. The package include sample data [`sample'] aswell as shape files for administration boundaries and collated Mid-Year-Population-Estimates.
+Assist NMC users to conduct standardised data management, wrangling and analysis of NMC data. The package is designed to ingest raw NMC data form the linelist export function on the NMC web-based application. The package include sample data [`sample'] aswell as shape files for administration boundaries and collated Mid-Year-Population-Estimates. See more details on the web address below. The package is still under development and is not yet available on CRAN.
+}
+\seealso{
+Useful links:
+\itemize{
+  \item \url{https://github.com/bridaybrummer/NMCleaner}
+}
+
 }
 \author{
 \strong{Maintainer}: Brian Brummer \email{brianb@nicd.ac.za} (\href{https://orcid.org/0000-0003-4626-416X}{ORCID})

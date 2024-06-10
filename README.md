@@ -13,17 +13,9 @@ to contact them [NMC Epidemiologist](mailto:brinb@nicd.ac.za)
 You can install {NMCleaner} from github with:
 
 ``` r
-devtools::install_github("bridaybrummer/NMCleaner", force = TRUE)
-library(NMCleaner)
-```
-
-if you have a personal access token, otherwise use:
-
-``` r
 if(!require("devtools")) install.packages("devtools")
 
-devtools::install_git("https://github.com/bridaybrummer/NMCleaner.git", force = TRUE)
-library(NMCleaner)
+devtools::install_github("bridaybrummer/NMCleaner", force = TRUE)
 ```
 
 First time installation may take up to 5 minutes as the package has many
@@ -97,4 +89,8 @@ removed.
 #clean_df %>%  at_a_glance()
 ```
 
-# Conclusion
+# Future Plans
+
+We would like to add more helper functions to the package, such as
+`epicurve()` and `epitable()` functions. We would also like to add a
+function that can produce a sitrep from the cleaned data.

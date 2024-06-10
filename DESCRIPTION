@@ -10,7 +10,10 @@ Description:
     The package is designed to ingest raw NMC data form the linelist 
     export function on the NMC web-based application. 
     The package include sample data [`sample'] aswell 
-    as shape files for administration boundaries and collated Mid-Year-Population-Estimates. 
+    as shape files for administration boundaries and collated Mid-Year-Population-Estimates.
+    See more details on the web address below. 
+    The package is still under development and is not yet available on CRAN.
+URL:https://github.com/bridaybrummer/NMCleaner
 License: `use_mit_license()`
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
