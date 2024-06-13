@@ -14,7 +14,7 @@ You can install {NMCleaner} from github with:
 
 ``` r
 if(!require("devtools")) install.packages("devtools")
-options(timeout = 500) #increase downlod time to avoid faiure
+options(timeout = 500) #increase download time to avoid faiure
 devtools::install_github("bridaybrummer/NMCleaner", force = TRUE)
 ```
 
