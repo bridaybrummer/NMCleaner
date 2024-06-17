@@ -11,6 +11,8 @@
 #' @return a tibble with the follwing variabels as factors: date, day, epiweek (CDC format), month, year
 #' @export
 #'
+#'
+#'
 #' @examples
 #' mutate_dates(data, date_index = "notification_date")
 #' # to see whether it is creating dates propoperly
@@ -34,17 +36,23 @@
 #'
 mutate_dates<- function(data, date_index){
 
+  conflicted::conflicts_prefer(grates::year,
+                               grates::isoweek,
+                               grates::epiweek,
+                               grates::year)
+
   #run functions to get date in correct format, try with year first or day first, try with excel and stats date formats
   # TO DO
   ## could try make an argument that give a pre_fix or suffix to the date variables for instance, year_notification and so on
   standard_group_vars<- c("year", "month", "epiweek", "date")
-  conflicted::conflicts_prefer(grates::year)
+
   data <- data %>%
-    mutate(date = as_date(data[[date_index]]))%>%
+    ungroup()%>%
+    mutate(date = as.Date(data[[date_index]]))%>%
     mutate(
       day_name = as.factor( format(date, "%A") ),
       day = as.factor(as.integer(format(date, "%d"))),
-      epiweek =  date %>%grates::as_epiweek%>%as.character()%>%gsub("\\d+-W", "", .)%>%as.integer(),
+      epiweek =  date %>%grates::as_epiweek()%>%as.character()%>%gsub("\\d+-W", "", .)%>%as.integer(),
       month = factor(grates::as_yearmonth(date)%>%as.character()%>%gsub("\\d+-", "", .), levels = month.abb),
       'year' = lubridate::epiyear(date)
     )%>%

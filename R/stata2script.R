@@ -10,345 +10,161 @@
 #'
 #' @import dplyr
 #' @import grates
-#' @import stringdist
-#' @import fuzzyjoin
+#' @importFrom lubridate as_date
+#' @importFrom fuzzyjoin stringdist_left_join
 #' @import readxl
 #' @import stringr
 #'
 #' @examples some example
 stata2script<- function(NMC, deduplicate_complete = FALSE ,verbose = T){
 
-  conflicted::conflicts_prefer(grates::year)
-  names(NMC) <- str_to_lower(names(NMC))
+  data<- NMC
+  conflicted::conflicts_prefer(grates::year,
+                               grates::isoweek,
+                               grates::epiweek,
+                               grates::year)
 
-  exclude_vars_early<-names(NMC)[c(1:17, 22:length(NMC))] # we are picking vars to exclude so we only chnage the opposite of those for the matching.
+  conflicted::conflicts_prefer(dplyr::filter)
 
-  include_vars <- setdiff(names(NMC), exclude_vars_early) # this will make the inverse of the excluded vars
+  names(data) <- str_to_lower(names(data))
+
+  exclude_vars_early<-names(data)[c(1:17, 22:length(data))] # we are picking vars to exclude so we only chnage the opposite of those for the matching.
+
+  include_vars <- setdiff(names(data), exclude_vars_early) # this will make the inverse of the excluded vars
 
   #NMC%>%mutate(across(contains("date"), as_date ))%>%
   #  mutate(across(contains("date"), as.character))%>%
   #  mutate(across(contains("date"), str_to_lower))%>%select(notification_date)
-  tabyl(dat = NMC, condition, epidemiological_classification )
+  tabyl(dat = data, condition, epidemiological_classification )
 
-  NMC1 <- NMC %>%
+  ## Date standardisations ----
+  suppressMessages(suppressWarnings(
+
+    NMC1 <- data %>%
     mutate(across(contains("date"), as_date)) %>%
-    mutate(across(all_of(include_vars), as.character)) %>% #string stadnardisation
+    mutate(across(all_of(include_vars), as.character)) %>% #string standardisation
     mutate(across(all_of(setdiff(include_vars, "notification_date")), str_to_lower)) %>% #string stadnardisation
-    #clean_names%>%
+
+    ## Factor Case Type ----
     mutate(
       case_type = factor(case_type, levels= c("Clinical", "Lab", "Merged")) )
+  ))
 
-  NMC1$notification_date
+
 
   NMC1$months<- as.character(grates::as_yearmonth(as_date(NMC1$notification_date)))
 
 
-NMC <- NMC1
-#nrow(NMC)
-#names(NMC)
-# Check Notifiation_date by quarter and month
-#xtabs(~as_quarter(NMC$Notification_Date))
-#xtabs(~as_yearmonth(NMC$Notification_Date))
-# Check Notifiation_date by quarter and month
-#xtabs(~as_quarter(NMC$Diagnosis_Date))
-#xtabs(~as_yearmonth(NMC$Diagnosis_Date))
+NMC2 <- NMC1
 
-#xtabs(~ is.na(Diagnosis_Date)+ Case_Type, NMC)
+start_number <- nrow(NMC2)
+print( paste0("The number of rows in the original dataset is ", start_number))
 
-#table(NMC$Province)
-# Exclusion of discarded, quality assurance cases, foreign cases
 
-data <- NMC %>%
-  mutate(exceptions = 0)
-
-names(data) <- str_to_lower(names(data))
+#names(data) <- str_to_lower(names(data))
 
 # Check for discarded cases
-xtabs( ~ epidemiological_classification, data = data)
+print(xtabs( ~ epidemiological_classification, data = NMC2))
+print(paste0("There are ", nrow(NMC2%>%filter(epidemiological_classification == "Discarded case")), " discarded cases"))
 
-print( nrow(data))
 
-data1 <- data %>%
-  mutate(exceptions = if_else(epidemiological_classification == "Discarded case", 1, exceptions))
+# remove Discarded cases
+data1 <- NMC2 %>%
+  dplyr::filter(!epidemiological_classification %in% "Discarded case")
 
-data1%>% nrow() %>%print()
+number_discarded<- nrow(NMC) - nrow(data1)
+print(paste0(  number_discarded, " cases were discarded based on the epidemiological classificaiton"))
 
-# Check and drop discarded cases
-table(data1$epidemiological_classification)
-
-data2 <- data1 %>%
-  filter(epidemiological_classification != "Discarded case")
-
-nrow(data1)
-data2%>% nrow() %>%print()
-
-# Check for category 4 conditions
-table(data2$condition)
-unique(data2$condition)
-
-# No cases
-
-# Check provinces
-table(data2$province, useNA = "always")
-
-data2 <- data2 %>%
-  arrange(province)
-
-data2 %>%
-  filter(province == "UNKNOWN") %>%select(facility)
-
-xtabs(~ facility, data = data2%>%
-        filter(province == "UNKNOWN") )
-  #View()  # Manually inspect and handle "UNKNOWN" province cases
 
 # Handle other facility exceptions
-data2 <- data2 %>%
-  mutate(exceptions = if_else(facility == "Rcpa Quality Assurance" | facility == "Uk Neqas Quality Assurance" |  facility == "qcmd quality assurance", 1, exceptions))
+data3 <- data1 %>%
+  filter(!grepl("qcmd quality assurance|Rcpa Quality Assurance|Uk Neqas Quality Assurance|Namibia Institute Of Pathology", ignore.case = T, facility))
 
-data3 <- data2 %>%
-  filter(facility != "Uk Neqas Quality Assurance")%>%
-  filter(!grepl("qcmd quality assurance", ignore.case = T, facility))
+quality_assurane<- nrow(data1) - nrow(data3)
+print(paste0("There were ", quality_assurane, " quality assurance cases removed \\n
+             this includes: QCMD quality assurance, UK& RCPA Nequas Quality Assurance, and Namibia INstitute of Pahtology. "))
 
-data3%>% nrow() %>%print()
-data3%>%filter(facility == "Qcmd quality assurance")
+data4<- data3
 
 # Drop other facilities
-data4 <- data3 %>%
-  filter(facility != "Namibia Institute Of Pathology")
-
-data4 %>% nrow() %>%print()
 
 number_of_study<- data4%>%filter( facility_type == "STUDY")
 
 tabyl_study_condtion <- tabyl(dat= data4%>%filter( facility_type == "STUDY"), condition)
 
-print(paste0("There can be ", nrow(number_of_study) , " study case(s) excluded"))
+print(paste0("There can be ", nrow(number_of_study) , " study case(s) excluded, they are not excluded in this function."))
 print(tabyl_study_condtion)
-# Replace province for specific facilities
+
+# Replace province for specific facilities ----
 data5 <- data4 %>%
-  mutate(province = if_else(facility == "Wits Rhi Sex Worker Program Wc" | facility == "Wits Rhi Agyw Prep Program Wc", "WC Western Cape", province))%>%
-  mutate(province = case_when((case_id == "230627_43520481") ~ "LP Limpopo", .default = province))%>%
-  filter(
-    #!facility_type %in% "STUDY"
-         )
+  mutate(province = if_else(facility == "Wits Rhi Sex Worker Program Wc" | facility == "Wits Rhi Agyw Prep Program Wc", "WC Western Cape", province))
 
+data9 <- data5 %>%
+  filter(!grepl("SAMPLE|SURVEY", patient_name) | !grepl("SAMPLE|SURVEY", patient_surname))
 
-data5 %>% nrow() %>%print()
-#data4%>%filter(case_id == "230627_43520481")%>%view()
+sample_observations<- nrow(data5) - nrow(data9)
+print(paste0("There were ", sample_observations, " SAMPLE or SURVEY (in patient name or surname) observations removed from the dataset"))
 
-
-xtabs(~is.na(data5$province))
-# Check for studies (facility "nicd")
-#data5 %>%
-#  filter(facility_type == "STUDY")%>%
-# View()  # Manually inspect and handle study cases
-# These
-
-data5 %>%
-  filter(grepl("Nicd", facility))# %>%
-#  View()  # Manually inspect and handle cases with "Nicd" in the facility
-
-# Remaining unknown facility is a CS from lab
-data5 <- data5 %>%
-  arrange(patient_name)
-
-#data5 %>%
-#  filter(grepl("SAMPLE", patient_name)) %>%
-#  View()  # Manually inspect and handle cases with "SAMPLE" in the patient_name
-
-data6 <- data5 %>%
-  filter(!grepl("SAMPLE", patient_name))
-
-data6 %>% nrow() %>%print()
-#data6 %>%
-#  filter(grepl("SAMPLE", patient_surname)) %>%
-#  View()  # Manually inspect and handle cases with "SAMPLE" in the patient_surname
-
-data7 <- data6 %>%
-  filter(!grepl("SAMPLE", patient_surname))
-
-data7 %>% nrow() %>%print()
-#data7 %>%
-#  filter(grepl("SURVEY", patient_name)) %>%
-#  View()  # Manually inspect and handle cases with "SURVEY" in the patient_name
-
-data8 <- data7 %>%
-  filter(!grepl("SURVEY", patient_name))
-
-data8 %>% nrow() %>%print()
-
-
-#data8 %>%
-#  filter(grepl("SURVEY", patient_surname)) %>%
-#  View()  # Manually inspect and handle cases with "SURVEY" in the patient_surname
-
-data9 <- data8 %>%
-  filter(!grepl("SURVEY", patient_surname))
-
-data9  %>% nrow() %>%print()
-#data9 %>%
-#  filter(grepl("Biorad Hiv/heps", patient_surname))# %>%
-#  View()  # Manually inspect and handle cases with "Biorad Hiv/heps" in the patient_surname
 
 data10 <- data9 %>%
   filter(!grepl("Biorad Hiv/heps", patient_surname))
 
-data10 %>% nrow() %>%print()
+biorad_remove <- nrow(data9) - nrow(data10)
+print(paste("There were ", biorad_remove, " cases with 'Biorad Hiv/heps' in the patient_surname removed from the dataset"))
 
-nrow(data)
-nrow(data10)
-# Drop specific Cholera cases
-data11 <- data10 %>%
-  filter(!(condition == "Cholera" & case_id == "230301_4184306")) %>%
-  filter(!(condition == "Cholera" & case_id == "230309_41996741")) %>%
-  filter(!(condition == "Cholera" & case_id == "230302_41850801")) %>%
-  filter(!(condition == "Cholera" & case_id == "230315_4204179")) %>%
-  filter(!(condition == "Cholera" & case_id == "230315_4204180")) %>%
-  filter(!(condition == "Cholera" & case_id == "230315_4204181")) %>%
-  filter(!(condition == "Cholera" & case_id == "230315_4204182")) %>%
-  filter(!(condition == "Cholera" & case_id == "230331_42235361"))
 
-data11 %>% nrow() %>%print()
 
-nrow(data11)
-data_semcleaned <- data
+data_semcleaned <- data10
 
-# ALTERNATIVE WAY
-#data <- data %>%
-#  mutate(QA = if_else(nmcfacility == "RCPA QUALITY ASSURANCE" | nmcfacility == "UK NEQAS QUALITY ASSURANCE", 1, 0)) %>%
-#  mutate(province = case_when(
-#    facility == "WITS RHI SEX WORKER PROGRAM WC" ~ "WC Western Cape",
-#    facility == "WITS RHI AGYW PREP PROGRAM WC" ~ "WC Western Cape",
-##    TRUE ~ province
-#  )) %>%
-#  mutate(QA = if_else(
-#    str_detect(patient_name, "SAMPLE") | str_detect(patient_surname, "SAMPLE") |
-#      str_detect(patient_surname, "SURVEY") | str_detect(patient_surname, "Biorad Hiv/heps"),
-#    1, QA
-#  )) %>%
-#  drop_na(QA)
 
-##################################################################
+# Unknown names ----
+unknwon_names <- data10 %>%
+  filter(patient_name == "UNKNOWN" | patient_surname == "UNKNOWN")%>%nrow()
 
-# Clerically review
-data12 <- data11 %>%
-  filter(patient_name != "UNKNOWN") %>%
-  filter(patient_surname != "UNKNOWN")
+print(paste0("There are ", unknwon_names, " cases with UNKNOWN in the patient_name or patient_surname"))
 
-data12%>% nrow() %>%print()
-
-# Clean string variables
-data13 <- data12 %>%
+## Cleaning names -----
+data14 <- data10 %>%
   mutate(patient_name = str_replace_all(patient_name, "[-:.;/()\\[\\],' ]", "")) %>%
   mutate(patient_surname = str_replace_all(patient_surname, "[-:.;/()\\[\\],]", ""))
 
-data13 %>% nrow() %>%print()
-# Clean DOB variable
-data14 <- data13 #%>%
-  #mutate(patient_dob = as.Date(as.character(patient_dob), format = "%d%b%Y")) #%>%
-  #mutate(patient_dob = if_else(as.numeric(as_year(patient_dob)) == 1923, "NA", as_date(patient_dob))) %>%
-  #mutate(patient_dob = if_else(month(patient_dob) == 1 & day(patient_dob) == 1 & year(patient_dob) == 1900, NA_Date_, patient_dob))
 
-xtabs(~data14$patient_age + data14$patient_age_unit)
-
-data14.1 <- data14%>%mutate(
-  Age_years = case_when(patient_age_unit == "Days"~ as.numeric(floor(as.numeric(patient_age)/365.25)),
-                        patient_age_unit == "Months"~ as.numeric(floor(as.numeric(patient_age)/12)),
-                        patient_age_unit == "Years"~ as.numeric(floor(as.numeric(patient_age)))
-  )
-)
-
-
-data14.2 <- data14.1%>% mutate(
-    age_dob = #floor(
-      as.numeric((difftime( as_date(notification_date),as_date(patient_dob), units = "days")))/365.25
-    #)
-  )%>%
-    mutate( age_dob = ifelse( is.na(age_dob), Age_years, age_dob))%>%
-  mutate(agecategory = case_when(
-    age_dob < 0 ~ "Unknown",
-    age_dob %in% 0:4 ~ "0-4",
-    age_dob %in% 5:9 ~ "5-9",
-    age_dob %in% 10:14 ~ "10-14",
-    age_dob %in% 15:19 ~ "15-19",
-    age_dob %in% 20:24 ~ "20-24",
-    age_dob %in% 25:29 ~ "25-29",
-    age_dob %in% 30:34 ~ "30-34",
-    age_dob %in% 35:39 ~ "35-39",
-    age_dob %in% 40:44 ~ "40-44",
-    age_dob %in% 45:49 ~ "45-49",
-    age_dob %in% 50:54 ~ "50-54",
-    age_dob %in% 55:59 ~ "55-59",
-    age_dob %in% 60:64 ~ "60-64",
-    age_dob %in% 65:200 ~ "65+",
-    is.na(age_dob) ~ "Unknown"
-  ))%>%
-  mutate(agecategory = factor(agecategory, levels = c(
-    "0-4", "5-9", "10-14", "15-19", "20-24", "25-29",
-    "30-34", "35-39", "40-44", "45-49", "50-54", "55-59",
-    "60-64", "65+", "Unknown")))
-
-print("Hello15")
-# Clean age variables
-data15 <- data14.2 %>%
-  mutate(patient_age = as.integer(patient_age)) %>%
-  mutate(agecategory_unit = case_when(
-    Age_years < 0 ~ NA,
-    Age_years %in% 0:4 ~ "0-4",
-    Age_years %in% 5:9 ~ "5-9",
-    Age_years %in% 10:14 ~ "10-14",
-    Age_years %in% 15:19 ~ "15-19",
-    Age_years %in% 20:24 ~ "20-24",
-    Age_years %in% 25:29 ~ "25-29",
-    Age_years %in% 30:34 ~ "30-34",
-    Age_years %in% 35:39 ~ "35-39",
-    Age_years %in% 40:44 ~ "40-44",
-    Age_years %in% 45:49 ~ "45-49",
-    Age_years %in% 50:54 ~ "50-54",
-    Age_years %in% 55:59 ~ "55-59",
-    Age_years %in% 60:64 ~ "60-64",
-    Age_years %in% 65:200 ~ "65+",
-    is.na(Age_years) ~ NA
-  ))
+# Creating new Age variables ----
 
 
 # Define breaks for age categories
 breaks <- c(-Inf, 0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, Inf)
 
-print("hello data15")
-
 # Assuming data14.2 is a data frame
-data15 <- data14.2 %>%
-  mutate(patient_age = as.integer(age_dob)) %>%
-  mutate(agecategory_unit  = cut(patient_age, breaks = breaks, labels = c(NA, "0-4", "5-9", "10-14", "15-19", "20-24", "25-29",
-                                                                          "30-34", "35-39", "40-44", "45-49", "50-54", "55-59",
-                                                                          "60-64", "65+"))) %>%
-  mutate(agecategory_unit = factor(agecategory_unit, levels = c(
-    NA, "0-4", "5-9", "10-14", "15-19", "20-24", "25-29",
-    "30-34", "35-39", "40-44", "45-49", "50-54", "55-59",
-    "60-64", "65+")))
+suppressMessages(suppressWarnings(
 
-
-
-# age category sensitivity analysis
-#xtabs(~ data15$agecategory_unit)
-#xtabs(~ data15$agecategory)
-#xtabs(~ data15$patient_age_category)
-
-
-#data15$agecategory%>%unique
-#summary(data15$Age_years)
-#hist(data15$Age_years)
-
-#xtabs(~ age_group, data = data15)
-#xtabs(~ agecategory, data = data15)
-#xtabs(~Age_years+agecategory, data = data15%>%filter(agecategory == "0-4"))
-#xtabs(~patient_age+agecategory + patient_age_unit, data = data15%>%filter(agecategory == "0-4"))
-
-# Clean gender variable
-print("hello data16")
-
-#library(dplyr)
+  data15 <- data14 %>%
+  mutate(
+    Age_years = case_when(patient_age_unit == "Days"~ as.numeric(floor(as.numeric(patient_age)/365.25)),
+                          patient_age_unit == "Months"~ as.numeric(floor(as.numeric(patient_age)/12)),
+                          patient_age_unit == "Years"~ as.numeric(floor(as.numeric(patient_age)))
+    )
+  )%>%
+  mutate(
+    age_dob = as.numeric((difftime( as_date(notification_date),as_date(patient_dob), units = "days")))/365.25
+  )%>%
+  mutate(
+    age_dob = ifelse( is.na(age_dob), Age_years, age_dob))%>%
+  mutate(
+    patient_age = as.integer(age_dob)) %>%
+  mutate(
+    agecategory_unit  = cut(patient_age,
+                            breaks = breaks,
+                            labels = c(NA, "0-4", "5-9", "10-14", "15-19", "20-24", "25-29",
+                                       "30-34", "35-39", "40-44", "45-49", "50-54", "55-59",
+                                       "60-64", "65+"))) %>%
+  mutate(
+    agecategory_unit = factor(agecategory_unit,
+                            levels =
+                                    c(NA, "0-4", "5-9", "10-14", "15-19", "20-24", "25-29",
+                                      "30-34", "35-39", "40-44", "45-49", "50-54", "55-59",
+                                      "60-64", "65+")))
+))
 
 data16 <- data15 %>%
   mutate(
@@ -387,75 +203,43 @@ dataCat1 <- data.frame(condition = c("Acute Flaccid Paralysis", "Acute rheumatic
 # I would rather stringdist match with the dataframe reference.
 
 print("hello fuzzy")
-
+# Assigning NMC categories ----
+print( "Assignign NMC catgeories")
 
 data16_1 <-
-  fuzzyjoin::stringdist_left_join(data16%>%mutate(match_condition = str_to_lower(condition)), condition_df%>%mutate(match_condition = str_to_lower(condition)), by =c("match_condition") , method = "jw", max_dist = 0.03)%>%
+  fuzzyjoin::stringdist_left_join(data16%>%mutate(match_condition = str_to_lower(condition)),
+                                  condition_df%>%mutate(match_condition = str_to_lower(condition)),
+                                  by =c("match_condition") ,
+                                  method = "jw",
+                                  max_dist = 0.03)%>%
   # rename condition.x to condition
   rename(condition = condition.x,
          match_condition = match_condition.x)
 
+condition_dt <- condition_df%>%as.data.table()
+#filter by nmccatgeories
 
+condition_category_1 <- condition_dt %>% filter(nmccategories == 1) %>% pull(condition)
+condition_category_2 <- condition_dt %>% filter(nmccategories == 2) %>% pull(condition)
+condition_category_3 <- condition_dt %>% filter(nmccategories == 3) %>% pull(condition)
 
+# Perform the mutation and filter in a single pipeline
 data17 <- data16_1 %>%
   mutate(nmccategories_old = case_when(
-    condition %in% c("Acute Flaccid Paralysis", "Acute rheumatic fever", "Botulism", "Cholera",
-                     "Crimean-Congo viral haemorrhagic fever (human)", "Ebola Virus (VHF)",
-                     "Lassa Fever Virus(VHF)", "Lujo Virus(VHF)", "Marburg Virus (VHF)",
-                     "Diphtheria", "Enteric fever (typhoid or paratyphoid fever)",
-                     "Food borne illness outbreak", "Listeriosis", "Malaria", "Measles",
-                     "Meningococcal Disease", "Pertussis", "Plague", "Rabies", "Smallpox",
-                     "VHF Other", "Rift Valley Fever", "Yellow Fever",
-                     "Waterborne illness outbreak - UNDEFINED", "Congenital rubella syndrome",
-                     "Rubella", "Haemolytic uraemic syndrome (HUS)", "Respiratory disease caused by a novel respiratory pathogen") ~ 1,
-    condition %in% c("Agricultural or stock remedy poisoning", "Bilharzia (schistosomiasis)",
-                     "Brucellosis", "Congenital syphilis", "Haemophilus influenzae type B",
-                     "Hepatitis A", "Hepatitis B", "Hepatitis C", "Hepatitis E", "Legionellosis",
-                     "Leprosy", "Lead poisoning", "Mercury poisoning",
-                     "Maternal death (pregnancy, childbirth and puerperium)",
-                     "Soil transmitted helminths", "Tetanus", "Tuberculosis:pulmonary",
-                     "Tuberculosis:extra-pulmonary", "Tuberculosis: extensively drug -resistant (XDR -TB)",
-                     "Tuberculosis: multidrug- resistant (MDR -TB)") ~ 2,
-condition %in% c("Endemic arboviral diseases Chikungunya virus",
-                 "Endemic arboviral diseases West Nile Virus",
-                 "Non-Endemic Arboviral Diseases: Zika Virus",
-                 "Non-Endemic arboviral diseases : Dengue Fever Virus",
-                 "Non-typhoidal Salmonellosis", "Shiga toxin-producing Escherichia coli",
-                 "Shigellosis", "Endemic arboviral diseases Sindbis Virus") ~ 3,
-.default = 4))%>%filter(nmccategories %in% c(1:3))
+    condition %in% condition_category_1 ~ 1,
+    condition %in% condition_category_2 ~ 2,
+    condition %in% condition_category_3 ~ 3,
+    TRUE ~ 4)) %>%
+  filter(nmccategories %in% 1:3)
 
 # Display frequency tables
 table(data17$nmccategories)
 table(data17$condition, data17$nmccategories)
 
-# Exlude cat4?
 
-#library(tidyverse)
-
-# Checking the plausibility of dates
-# codebook symptom_date diagnosis_date notification_date
-# Symptom date, diagnosis date, date of notification, date specimen taken, date patient death are all in numeric daily dates
-# type = numeric daily date (int)
-data17 %>%
-  filter(symptom_date > diagnosis_date) %>%
-  count()
-# n = 0
-
-data18 <- data17 %>%
-  arrange(diagnosis_date, notification_date, symptom_date)
-# ed
-
-data18 %>%
-  filter(diagnosis_date > notification_date) %>%
-  count()
-# n = 4
-
-data19 <- data18 %>%
-  arrange(diagnosis_date, notification_date, symptom_date, condition, case_id, case_source)
-# ed
 
 # Generate additional date-related variables
-data20 <- data19 %>%
+data20 <- data17 %>%
   mutate(time_to_notification = as.numeric(difftime(as_date(notification_date), as_date(diagnosis_date), units = "days"))) %>%
   arrange(time_to_notification, symptom_date, diagnosis_date, notification_date)
 
@@ -472,26 +256,9 @@ data21 <- data20 %>%
          Month_diagnosis = grates::as_yearmonth(diagnosis_date),
          Year_notification = grates::as_year(notification_date),
          Month_notification = grates::as_yearmonth(notification_date)
-    )
+    )%>%
+  mutate_dates("notification_date")
 
-#data21 <- data20 %>%
-#  mutate(
-#    Year_symptoms = as_year(coalesce(symptom_date,as_date(substr(excel_load$case_id, 1, 6), format = "%y%m%d"))),
-#    Month_symptoms = as_yearmonth(coalesce(symptom_date, as_date(substr(excel_load$case_id, 1, 6), format = "%y%m%d"))),
-#    Year_diagnosis = as_year(coalesce(diagnosis_date, as_date(substr(excel_load$case_id, 1, 6), format = "%y%m%d"))),
-#    Month_diagnosis = as_yearmonth(coalesce(diagnosis_date, as_date(substr(excel_load$case_id, 1, 6), format = "%y%m%d"))),
-#    Year_notification = as_year(coalesce(notification_date, as_date(substr(excel_load$case_id, 1, 6), format = "%y%m%d"))),
-#    Month_notification = as_yearmonth(coalesce(notification_date, as_date(substr(excel_load$case_id, 1, 6), format = "%y%m%d")))
-#  )
-
-
-# Epiweek is better calculated in Excel, R tends to overestimate the number of weeks
-
-
-# Duplicate and manual linking
-data21 %>%
-  count()
-# 10,625
 
 data22<- data21 %>%
   mutate(facility = tolower(facility))
@@ -499,11 +266,21 @@ data22<- data21 %>%
 #save(data, file = "March2023_beforededuplication.csv", replace = TRUE)  # Replace "March2023_beforededuplication.csv" with the desired file path and name
 
 # Edit case_type to record manually linked cases
-data23 <- data22 %>%
-  group_by(case_id) %>%
-  mutate(duplicate = ifelse(n() > 1, "duplicate", "unique"),
-         dup_number = row_number()) %>%
-  ungroup()
+data22_dt<- data22%>%as.data.table()
+
+data22_dt[, `:=`(duplicate = if (.N > 1) "duplicate" else "unique",
+              dup_number = seq_len(.N)),
+       by = case_id]
+
+data23<- data22_dt
+
+data23<- data23%>%as_tibble()%>%ungroup()
+
+#data23 <- data22 %>%
+# group_by(case_id) %>%
+#  mutate(duplicate = ifelse(n() > 1, "duplicate", "unique"),
+#         dup_number = row_number()) %>%
+#  ungroup()
 
 tabyl_of_duplicates<- data23%>%tabyl(condition, dup_number, dat = .)
 
@@ -1294,17 +1071,6 @@ data_dup33 <- data_dup32 %>%
   filter( !( condition == "Malaria"& case_definition == "Suspected" ) )
 
 
-# congential Rubella syndrome can only be suspected or confirmed if there is an epi classification and/or it is a merged case.
-# also need to check on cholera and diptheria numbers.
-
-######
-
-
-######
-
-
-xtabs(~ data_dup32$agecategory)
-xtabs(~ data_dup32$agecategory_unit)
 
 data_dup32%>% nrow() %>%print()
 
@@ -1312,13 +1078,23 @@ data_dup32%>% nrow() %>%print()
 #tabyl_of_duplicates<- data23%>%tabyl(condition, dup_number, dat = .)
 #print(tabyl_of_duplicates)
 
-#df_of_duplicates <- data23%>%filter(duplicate %in% "duplicate")
+df_of_duplicates <- data23%>%filter(duplicate %in% "duplicate")
 
 
-return(list(data_dup33 = data_dup33, tabyl_of_duplicates = tabyl_of_duplicates#,
-            #df_of_duplicates = df_of_duplicates
-            )
-            )
+cat("\nThe function has run completely.\n",
+    "To access the cleaned data, run: <object_name>$data\n",
+    "To access the table of duplicates, run: <object_name>$df_of_duplicates\n",
+    "If you want to make an epicurve, start with ?epicurve_df\n\n",
+    sep = "")
+
+# Return a list of objects
+return(list(data = data_dup33,
+            tabyl_of_duplicates = tabyl_of_duplicates,
+            df_of_duplicates = df_of_duplicates))
 }
+
+
+
+
 
 

@@ -14,6 +14,13 @@
 #' @return returns a data.frame with the date, epiweek, month, year, lab, n, cumulative and day columns including zero reporting on all dates
 #' @export
 #'
+#' @import dplyr
+#' @import lubridate
+#' @importFrom zoo rollmean rollapply
+#' @import grates
+#' @importFrom tidyr complete
+#' @importFrom stats poisson.test
+#'
 #' @examples
 #' df_to_plot<- epicurve_df(patient_level_data = , date_index = "date", extra_group_by = "case_definition")
 #'
@@ -25,7 +32,12 @@ epicurve_df<- function( data = data,
   # the goal of this function is to return a dataframe that can be used to plot an epicurve
   # crucially, it has every date in the range of data including zero counts so that it can be plotted.
   # it also takes a single date index and returns the relevant epiweek, month and years.
-  conflicted::conflicts_prefer(grates::year, grates::isoweek, dplyr::filter)
+
+  conflicted::conflicts_prefer(grates::year,
+                               grates::isoweek,
+                               grates::epiweek,
+                               grates::year,
+                               dplyr::filter)
   # ensure date_index is in
 
   # put this function in just in case.
@@ -108,8 +120,8 @@ epicurve_df<- function( data = data,
       #ci_lower = zoo::rollapply(n, add_rolling_avg[2], function(x) t.test(x)$conf.int, fill = NA, align = "right")[,2]
 
       # these are better as they use a poisson distributions for the count data in geenrating the CI
-      ci_upper = lag(zoo::rollapply(n, width = add_rolling_avg[2], function(x) poisson.test(sum(x), T = length(x))$conf.int, fill = 0, align = "right")[,1],lag_size),
-      ci_lower = lag(zoo::rollapply(n, width = add_rolling_avg[2], function(x) poisson.test(sum(x), T = length(x))$conf.int, fill = 0, align = "right")[,2], lag_size)
+      ci_upper = lag(zoo::rollapply(n, width = add_rolling_avg[2], function(x) stats::poisson.test(sum(x), T = length(x))$conf.int, fill = 0, align = "right")[,1],lag_size),
+      ci_lower = lag(zoo::rollapply(n, width = add_rolling_avg[2], function(x) stats::poisson.test(sum(x), T = length(x))$conf.int, fill = 0, align = "right")[,2], lag_size)
     )%>%ungroup()%>%
     mutate(across(where(is.numeric), ~ifelse( is.na(.) , 0, as.numeric(.))))%>%
     mutate( across( all_of( standard_group_vars), ~as.factor(.)))%>%

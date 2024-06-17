@@ -19,8 +19,11 @@ Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.1
 Imports: 
-    glue
+    glue,
+    dplyr, 
+    grates
 Depends: 
+    lubridate,
     conflicted,
     data.table,
     dplyr,
@@ -35,13 +38,13 @@ Depends:
     haven,
     janitor,
     knitr,
-    lubridate,
     magrittr,
     R (>= 2.10),
     readxl,
     sf,
     stringdist,
     stringr,
+    stats,
     tidyverse,
     tinytex,
     zoo

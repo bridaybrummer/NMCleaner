@@ -25,7 +25,11 @@
 #'
 create_date_template<- function( start_date , end_date, reps = 1, rep_on_var = NULL, rep_var_name =NULL) {
 
-  conflicted::conflicts_prefer(grates::year)
+  conflicted::conflicts_prefer(grates::year,
+                               grates::isoweek,
+                               grates::epiweek,
+                               grates::year,
+                               dplyr::filter)
 
   standard_group_vars<- c("year", "month", "epiweek", "date")
 
