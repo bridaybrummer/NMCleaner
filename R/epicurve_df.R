@@ -92,9 +92,6 @@ epicurve_df<- function( data = data,
     summarise(n = n(),
     )%>%ungroup()
 
-  epicurve_template%>%
-    group_by(condition, month)%>%
-    summarise(n = n())
 
   df<-
     epicurve_template%>%left_join(.,
