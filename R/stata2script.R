@@ -78,7 +78,7 @@ print(paste0(  number_discarded, " cases were discarded based on the epidemiolog
 
 # Handle other facility exceptions
 data3 <- data1 %>%
-  filter(!grepl("qcmd quality assurance|Rcpa Quality Assurance|Uk Neqas Quality Assurance|Namibia Institute Of Pathology", ignore.case = T, facility))
+  filter(!grepl("rcpa quality assurance|qcmd quality assurance|Rcpa Quality Assurance|Uk Neqas Quality Assurance|Namibia Institute Of Pathology", ignore.case = T, facility))
 
 quality_assurane<- nrow(data1) - nrow(data3)
 print(paste0("There were ", quality_assurane, " quality assurance cases removed \\n
