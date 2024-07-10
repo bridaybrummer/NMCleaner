@@ -2,3 +2,4 @@
 ^\.Rproj\.user$
 ^NMCleaner\.Rproj$
 ^building\.R$
+^data-raw$
