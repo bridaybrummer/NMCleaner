@@ -48,7 +48,8 @@ create_date_template<- function( start_date , end_date, reps = 1, rep_on_var = N
   }else{
     data<-
       tibble(
-        date = dates
+        date = dates,
+        !!rep_var_name := rep(rep_on_var, length.out=length(dates))
       )
   }
 

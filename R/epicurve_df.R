@@ -54,7 +54,6 @@ epicurve_df<- function( data = data,
 
   if (!is.null(grouping_vars)){
 
-
   grouping_vars_length <- data[[grouping_vars]]%>%unique() %>%length # will have to do a few of these if ther are more grouping vars.
 
   epicurve_template<-
@@ -64,13 +63,15 @@ epicurve_df<- function( data = data,
   }else{
     epicurve_template<-
       tibble(
+        grouping_vars = "one_group"
       )
   }
 
-  epicurve_template<-create_date_template(min(dates), max(dates),
-                       reps = length(data[[grouping_vars]]%>%unique),
-                       rep_on_var = data[[grouping_vars]]%>%unique,
-                       rep_var_name = grouping_vars)
+  epicurve_template<-create_date_template(
+    min(dates), max(dates),
+    reps = length(data[[grouping_vars]]%>%unique),
+    rep_on_var = data[[grouping_vars]]%>%unique,
+    rep_var_name = grouping_vars)
 
 
   standard_group_vars<- c("year", "month", "epiweek", "date")
@@ -122,7 +123,7 @@ epicurve_df<- function( data = data,
     )%>%ungroup()%>%
     mutate(across(where(is.numeric), ~ifelse( is.na(.) , 0, as.numeric(.))))%>%
     mutate( across( all_of( standard_group_vars), ~as.factor(.)))%>%
-    tibble
+    tibble()
 
   # you need to add some descriptors of the dataframe so that they can be used in the plot.
 

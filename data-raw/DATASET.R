@@ -240,3 +240,16 @@ centre_contacts<- data.frame(province = c(centres),
 
 
 usethis::use_data(condition_df, overwrite = TRUE)
+
+
+###
+infectious_diseases <-
+  tibble::tibble(
+    condition = "Cholera", "Measles",
+    mean_incubation_period = c(4, 2),
+    Rt = c(2.5, 3.5),
+    generation_time = c(10, 12),
+    refs = c("WHO", "CDC")
+  )
+
+usethis::use_data(infectious_diseases, overwrite = TRUE)

@@ -13,11 +13,11 @@ Description:
     as shape files for administration boundaries and collated Mid-Year-Population-Estimates.
     See more details on the web address below. 
     The package is still under development and is not yet available on CRAN.
-URL:https://github.com/bridaybrummer/NMCleaner
+URL: https://github.com/bridaybrummer/NMCleaner
 License: `use_mit_license()`
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.1
+RoxygenNote: 7.3.2
 Imports: 
     glue,
     dplyr, 
