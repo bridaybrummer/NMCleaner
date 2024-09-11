@@ -52,7 +52,9 @@ epicurve_df<- function( data = data,
 
   dates<- seq.Date(floor_date(min(data[[date_index]]), "month"), ceiling_date(max(data[[date_index]]), "month"), by = "day")
 
-  if (!is.null(grouping_vars)){
+  if (grouping_vars %>% { if (is.null(.)) "null" else . } %in% names(data) # if the NULL argument is made
+                                                                          # then it will check it and return "null" as char
+      ){
 
   grouping_vars_length <- data[[grouping_vars]]%>%unique() %>%length # will have to do a few of these if ther are more grouping vars.
 
@@ -60,18 +62,37 @@ epicurve_df<- function( data = data,
     tibble(
       !!grouping_vars := rep(data[[grouping_vars]] %>%unique(), each = length(dates)),
     )
+
   }else{
+    print( "The name specified in grouping_vars does not exist in the dataframe.\n
+           The function has given a general single_grouping_var" )
+
+    # iF the name doesn't match any in the data, or ifit is null, we will still give a grouping
+    # we woudl recommend a grouping_var as some kind of descriptor, such as "Mpox", "Measles" etc.
+
+    grouping_vars <- "single_grouping_var"
+
+    grouping_vars_length <- 1
+
     epicurve_template<-
       tibble(
-        grouping_vars = "one_group"
+        !!grouping_vars := rep(data[[grouping_vars]] %>%unique(), each = length(dates)),
       )
+
+    # since we will create a n epicurve template with a variabel name that is not int he dataset,
+    # we need to create that variable name.
+
+    data <- data %>%
+      mutate(
+        !!grouping_vars := "single_grouping_var")
   }
 
-  epicurve_template<-create_date_template(
-    min(dates), max(dates),
-    reps = length(data[[grouping_vars]]%>%unique),
-    rep_on_var = data[[grouping_vars]]%>%unique,
-    rep_var_name = grouping_vars)
+  epicurve_template<-
+    create_date_template(
+      min(dates), max(dates),
+      reps = length(data[[grouping_vars]]%>%unique),
+      rep_on_var = data[[grouping_vars]]%>%unique,
+      rep_var_name = grouping_vars)
 
 
   standard_group_vars<- c("year", "month", "epiweek", "date")
@@ -95,9 +116,10 @@ epicurve_df<- function( data = data,
 
 
   df<-
-    epicurve_template%>%left_join(.,
-                                  aggregated ,
-                                  by = c(group_vars)
+    epicurve_template%>%
+    left_join(.,
+              aggregated ,
+              by = c(group_vars)
     ) %>%
     ungroup() %>%
     mutate( across(where(is.numeric), ~ifelse( is.na(.) , 0, as.numeric(.))),
