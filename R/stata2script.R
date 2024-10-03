@@ -698,7 +698,7 @@ data_dup23 <- data_dup22 %>%
   ))
 
 data_dup24 <- data_dup23 %>%
-  filter(!(condition == "Malaria" & grepl("X-ray|Rapid test", diagnosis_method, ignore.case = T ))) # i cannot remember why we do this
+  filter(!(condition == "Malaria" & grepl("X-ray", diagnosis_method, ignore.case = T ))) # i cannot remember why we do this
 
 xtabs(~ condition+diagnosis_method, data =data_dup24 )
 
