@@ -8,6 +8,7 @@ epicurve_df(
   data = data,
   date_index = date_index,
   grouping_vars = NULL,
+  fill_vars = NULL,
   add_rolling_avg = c(TRUE, 7),
   lag_size = 0
 )

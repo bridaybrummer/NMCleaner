@@ -26,7 +26,8 @@
 #'
 epicurve_df<- function( data = data,
                          date_index = date_index,
-                         grouping_vars =NULL,
+                         grouping_vars =NULL, # suggested to be a gourpign var like condition or district
+                         fill_vars = NULL, # could be a fill var to change coloru on the same graph, pass forecast or case_definition
                          add_rolling_avg = c(TRUE, 7),
                          lag_size = 0 ){
   # the goal of this function is to return a dataframe that can be used to plot an epicurve

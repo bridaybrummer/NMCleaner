@@ -9,6 +9,7 @@
 #' @export
 #'
 #' @import dplyr
+#' @importFrom dplyr filter
 #' @import grates
 #' @importFrom lubridate as_date
 #' @importFrom fuzzyjoin stringdist_left_join
@@ -679,7 +680,7 @@ count(data_dup21)
 #Drop malaria notificaitons accoridn gto maxwell SOP
 print(paste0( "Drop malaria notificaitons accoring to maxwell SOP"))
 data_dup22 <- data_dup21 %>%
-  filter(!(condition == "Malaria" & diagnosis_method == "Clinical signs and symptoms ONLY|Other|X-ray|Rapid test" & is.na(episode_number)))
+  filter(!(condition == "Malaria" & diagnosis_method == "Clinical signs and symptoms ONLY|Other|X-ray" & is.na(episode_number)))
 
 data_dup22 %>% nrow() %>%print()
 

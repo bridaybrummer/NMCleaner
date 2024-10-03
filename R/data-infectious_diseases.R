@@ -35,11 +35,11 @@
 ###
 infectious_diseases <-
   tibble::tibble(
-    condition = c("Cholera", "Measles"),
-    mean_incubation_period = c(4, 2),
-    Rt = c(2.5, 3.5),
-    generation_time = c(10, 12),
-    refs = c("WHO", "CDC")
+    condition = c("Cholera", "Measles", "Mpox"),
+    mean_incubation_period = c(4, 2, 10),
+    Rt = c(2.5, 3.5, 1.5),
+    generation_time = c(10, 12, 10 ),
+    refs = c("WHO", "CDC", "guesswork")
   )
 
   save(infectious_diseases, file = "data/infectious_diseases.rda")
