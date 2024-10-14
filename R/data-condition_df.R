@@ -58,7 +58,7 @@ category_1 <- c(
   "Anthrax",
   "Botulism",
   "Cholera",
-  #"COVID-19",
+  "COVID-19",
   "Congenital rubella syndrome",
   "Diphtheria",
   "Enteric fever (typhoid or paratyphoid fever)",
