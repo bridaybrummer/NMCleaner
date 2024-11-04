@@ -2,7 +2,7 @@
 % Please edit documentation in R/mutate_district_name.r
 \name{mutate_district_name}
 \alias{mutate_district_name}
-\title{Title: Standardise District Names}
+\title{Standardise District Names}
 \usage{
 mutate_district_name(data, district_variable = district_variable)
 }
@@ -15,6 +15,11 @@ mutate_district_name(data, district_variable = district_variable)
 A dataset with the district names standardised.
 }
 \description{
-I woudl recommend aggregating data before using this function to reduce run time (even thought it is farly fast already)
+I would recommend aggregating data before using this function to reduce run time (even thought it is farly fast already)
 Description: This script standardises district names across different datasets.
+}
+\examples{
+new_master[sample(1000: 1),]\%>\%
+   mutate_district_name(., district_variable = "district")->
+   master_subset
 }

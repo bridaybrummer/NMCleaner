@@ -4,3 +4,4 @@
 ^building\.R$
 ^data-raw$
 ^dev$
+^.vscode$
