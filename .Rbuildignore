@@ -3,3 +3,4 @@
 ^NMCleaner\.Rproj$
 ^building\.R$
 ^data-raw$
+^dev$
