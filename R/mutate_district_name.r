@@ -161,45 +161,44 @@ vlookup("o.r.tambo")
 # Save this as a funciton in the NMCleaner package and also impleemnt it on the population  and shape data, then create th dashboard. 
 
 # get common words that could be confusing  and exclude them from the names 
-c(pop_district_names, nmc_districts) %>%
-    tolower()%>%
-    str_split( " ")%>%
-    map( ~data.frame( word = .x, stringsAsFactors = FALSE))%>%
-    bind_rows()%>%
-    count( word )%>%
-    arrange( -n)%>%
-    dplyr::filter( n > 4) %>%# so things like west and cape are kept * also note the "of " in thabo mofutsanyane
-    pull( word )%>%
-    str_c( collapse = paste0("|"))-> 
-    common_words
-
-common_words
-
-c("municipality|district|city|metro|metropolitan|of")-> common_words
-
-rep( NA, 0)
-tibble( 
-    district_pop = c(pop_district_names%>%str_to_lower%>%gsub( "\\(.*", "", . )%>%gsub( common_words,  "", . ) %>%trimws()%>%sort(),  rep(NA, length(  nmc_districts)- length(pop_district_names)) ) ,
-    district_shape = c(shape_district_names%>%str_to_lower%>%gsub( "\\(.*", "", . )%>%gsub( common_words,  "", . ) %>%trimws()%>%sort(), rep(NA, length( nmc_districts)- length(shape_district_names))),
-    district_nmc = nmc_districts%>%str_to_lower%>%gsub( "\\(.*", "", . )%>%gsub( common_words,  "", . ) %>%trimws()%>%sort()
-) %>%
-    mutate( 
-        district_standard_pop = map_chr( district_pop, vlookup),
-        district_standard_shape = map_chr( district_shape, vlookup),
-        district_standard_nmc = map_chr( district_nmc, vlookup)
-    )%>%arrange( district_standard_pop) ->
-    pop_districts
-
-    pop_districts[c("district_pop", "district_standard_pop", "district_nmc","district_standard_nmc", "district_shape", "district_standard_shape" )]%>%view()
-
-pop_districts%>%print(n = 100)
-
-# find common n grams and remove the ones that occur more than once. 
-
-library(tidytext)
-library(tidyverse)
-
-common_words
+# Commented out code
+# c(pop_district_names, nmc_districts) %>%
+#     tolower()%>%
+#     str_split( " ")%>%
+#     map( ~data.frame( word = .x, stringsAsFactors = FALSE))%>%
+#     bind_rows()%>%
+#     count( word )%>%
+#     arrange( -n)%>%
+#     dplyr::filter( n > 4) %>%# so things like west and cape are kept * also note the "of " in thabo mofutsanyane
+#     pull( word )%>%
+#     str_c( collapse = paste0("|"))-> 
+#     common_words
+# 
+# common_words
+# 
+# c("municipality|district|city|metro|metropolitan|of")-> common_words
+# 
+# rep( NA, 0)
+# tibble( 
+#     district_pop = c(pop_district_names%>%str_to_lower%>%gsub( "\\(.*", "", . )%>%gsub( common_words,  "", . ) %>%trimws()%>%sort(),  rep(NA, length(  nmc_districts)- length(pop_district_names)) ) ,
+#     district_shape = c(shape_district_names%>%str_to_lower%>%gsub( "\\(.*", "", . )%>%gsub( common_words,  "", . ) %>%trimws()%>%sort(), rep(NA, length( nmc_districts)- length(shape_district_names))),
+#     district_nmc = nmc_districts%>%str_to_lower%>%gsub( "\\(.*", "", . )%>%gsub( common_words,  "", . ) %>%trimws()%>%sort()
+# ) %>%
+#     mutate( 
+#         district_standard_pop = map_chr( district_pop, vlookup),
+#         district_standard_shape = map_chr( district_shape, vlookup),
+#         district_standard_nmc = map_chr( district_nmc, vlookup)
+#     )%>%arrange( district_standard_pop) ->
+#     pop_districts
+# 
+#     pop_districts[c("district_pop", "district_standard_pop", "district_nmc","district_standard_nmc", "district_shape", "district_standard_shape" )]%>%view()
+# 
+# pop_districts%>%print(n = 100)
+# 
+# library(tidytext)
+# library(tidyverse)
+# 
+# common_words
 
 # Make this into a function that will take some sort of district name and return its standardised version 
 
