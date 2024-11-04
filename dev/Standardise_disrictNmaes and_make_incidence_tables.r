@@ -252,79 +252,6 @@ prov_incidence_df[c("prov", "pop", "n", "incidence", "date")]%>%print(n = 9)
 prov_incidence_df$prov%>%unique()
 # Calcualte smallest part first, incidence per day 
 
-conflicted::conflicts_prefer(dplyr::lag)
-
-stats::poisson.test( x = 1, T = 1000)
-
-stats::prop.test( x = 45, n = 100)
-stats::poisson.test( x = 45, T = 100)
-?stats::t.test
-stats::t.test( x = -45:45, n = 100)
-stats::chisq.test( x = c(45, 55), p = c(0.5, 0.5))
-stats::dnbinom( x = 45, size = 100, mu = 50)
-
-
-
-c(seq( 10, 1000, 10 ), seq( 1000, 10 , -10))-> increase_case_counts 
-# calc perc changes 
-tibble( 
-    x = seq( 1, length(increase_case_counts), 1),
-    n = increase_case_counts)%>%
-    mutate( 
-        seven_day_avg = rollmean( n, 7, fill = NA, align = "right"),
-        seven_day_avg_change = ((lag(seven_day_avg,0) /lag(seven_day_avg, 1))*100),
-        # get the variance of the last 7 case counts for a CI to compute the CI of the percentage change
-        ci_lower = 
-            lag(zoo::rollapply(round(abs(seven_day_avg_change)), width = 7, function(x) stats::poisson.test(sum(x, na.rm = TRUE), T = length(x))$conf.int, fill = 0, align = "left")[,1],0),
-        ci_upper = 
-            lag(zoo::rollapply(round(abs(seven_day_avg_change)), width = 7, function(x) stats::poisson.test(sum(x, na.rm = TRUE), T = length(x))$conf.int, fill = 0, align = "left")[,2],0),
-        prev_seven_day_avg = rollapply(n, width = 10, FUN = mean, fill = NA, align = "right"))%>%
-        filter( !is.na(seven_day_avg_change))->
-
-        demo_increase
-
-    demo_increase%>%
-        ggplot( 
-            data = . ,
-        )+
-        geom_col( aes( x = x, y = n ))+
-        geom_line(aes(x = x, y = seven_day_avg_change))
-        
-    
-        # Calculate the percentage change compared to the average of the previous 7 days
-    
-    demo_increase%>%
-        ggplot( 
-            data = . ,
-            aes( x = x , y = seven_day_avg_change))+
-        geom_ribbon(group = 1, aes(  ymin = ci_lower, ymax = ci_upper)) +
-        geom_line()+
-        theme_classic()
-        
-    
-        # Calculate the percentage change compared to the average of the previous 7 days
-    )%>%
-    rowwise()%>%
-    mutate(
-        seven_day_avg_change = lead((seven_day_avg / prev_seven_day_avg ) * 100, 0) 
-    )-> 
-        demo_increase
-
-demo_increase%>%view()
-demo_increase$seven_day_avg_change%>%round()%>%abs()
-
-demo_increase%>% mutate( 
-    upper_ci = lag(zoo::rollapply(round(abs(seven_day_avg_change)), width = 1, function(x) stats::poisson.test(sum(x, na.rm = TRUE), T = length(x))$conf.int, fill = 0, align = "right")[,1],0),
-    lower_ci = lag(zoo::rollapply(round(abs(seven_day_avg_change)), width = 1, function(x) stats::poisson.test(sum(x, na.rm = TRUE), T = length(x))$conf.int, fill = 0, align = "right")[,2],0)
-    )%>%view() 
-# it might be best to just use some kind f distribution form the poisson and make it into a percentage. 
-
-wind_and_lag<- 14
-prov_incidence_df1<- NULL
-prov_incidence_df$incidence
-
-
-
 prov_incidence_df %>%
     #group_by( prov)%>%
        # rowwise() %>%
@@ -338,8 +265,8 @@ prov_incidence_df %>%
     
             # add a negative binomial confidene interval to this 
             #seven_day_avg_change_CI = 
-            upper_ci = lag(zoo::rollapply(round(abs(seven_day_avg_change)), width = 1, function(x) stats::poisson.test(sum(x, na.rm = TRUE), T = length(x))$conf.int, fill = 0, align = "right")[,1],0),
-            lower_ci = lag(zoo::rollapply(round(abs(seven_day_avg_change)), width = 1, function(x) stats::poisson.test(sum(x, na.rm = TRUE), T = length(x))$conf.int, fill = 0, align = "right")[,2],0),
+            #upper_ci = lag(zoo::rollapply(round(abs(seven_day_avg_change)), width = 1, function(x) stats::poisson.test(sum(x, na.rm = TRUE), T = length(x))$conf.int, fill = 0, align = "right")[,1],0),
+            #lower_ci = lag(zoo::rollapply(round(abs(seven_day_avg_change)), width = 1, function(x) stats::poisson.test(sum(x, na.rm = TRUE), T = length(x))$conf.int, fill = 0, align = "right")[,2],0),
             
             seven_day_avg_change_14bin = ((seven_day_avg - lag(seven_day_avg, 14))/lag(seven_day_avg, 14)*100),
 
@@ -455,5 +382,80 @@ flextable(final_table) %>%
 
 
 
+
+
+### Experiment with the rollign average 
+
+
+conflicted::conflicts_prefer(dplyr::lag)
+
+stats::poisson.test( x = 1, T = 1000)
+
+stats::prop.test( x = 45, n = 100)
+stats::poisson.test( x = 45, T = 100)
+?stats::t.test
+stats::t.test( x = -45:45, n = 100)
+stats::chisq.test( x = c(45, 55), p = c(0.5, 0.5))
+stats::dnbinom( x = 45, size = 100, mu = 50)
+
+
+
+c(seq( 10, 1000, 10 ), seq( 1000, 10 , -10))-> increase_case_counts 
+# calc perc changes 
+tibble( 
+    x = seq( 1, length(increase_case_counts), 1),
+    n = increase_case_counts)%>%
+    mutate( 
+        seven_day_avg = rollmean( n, 7, fill = NA, align = "right"),
+        seven_day_avg_change = ((lag(seven_day_avg,0) /lag(seven_day_avg, 1))*100),
+        # get the variance of the last 7 case counts for a CI to compute the CI of the percentage change
+        ci_lower = 
+            lag(zoo::rollapply(round(abs(seven_day_avg_change)), width = 7, function(x) stats::poisson.test(sum(x, na.rm = TRUE), T = length(x))$conf.int, fill = 0, align = "left")[,1],0),
+        ci_upper = 
+            lag(zoo::rollapply(round(abs(seven_day_avg_change)), width = 7, function(x) stats::poisson.test(sum(x, na.rm = TRUE), T = length(x))$conf.int, fill = 0, align = "left")[,2],0),
+        prev_seven_day_avg = rollapply(n, width = 10, FUN = mean, fill = NA, align = "right"))%>%
+        filter( !is.na(seven_day_avg_change))->
+
+        demo_increase
+
+    demo_increase%>%
+        ggplot( 
+            data = . ,
+        )+
+        geom_col( aes( x = x, y = n ))+
+        geom_line(aes(x = x, y = seven_day_avg_change))
+        
+    
+        # Calculate the percentage change compared to the average of the previous 7 days
+    
+    demo_increase%>%
+        ggplot( 
+            data = . ,
+            aes( x = x , y = seven_day_avg_change))+
+        geom_ribbon(group = 1, aes(  ymin = ci_lower, ymax = ci_upper)) +
+        geom_line()+
+        theme_classic()
+        
+    
+        # Calculate the percentage change compared to the average of the previous 7 days
+    )%>%
+    rowwise()%>%
+    mutate(
+        seven_day_avg_change = lead((seven_day_avg / prev_seven_day_avg ) * 100, 0) 
+    )-> 
+        demo_increase
+
+demo_increase%>%view()
+demo_increase$seven_day_avg_change%>%round()%>%abs()
+
+demo_increase%>% mutate( 
+    upper_ci = lag(zoo::rollapply(round(abs(seven_day_avg_change)), width = 1, function(x) stats::poisson.test(sum(x, na.rm = TRUE), T = length(x))$conf.int, fill = 0, align = "right")[,1],0),
+    lower_ci = lag(zoo::rollapply(round(abs(seven_day_avg_change)), width = 1, function(x) stats::poisson.test(sum(x, na.rm = TRUE), T = length(x))$conf.int, fill = 0, align = "right")[,2],0)
+    )%>%view() 
+# it might be best to just use some kind f distribution form the poisson and make it into a percentage. 
+
+wind_and_lag<- 14
+prov_incidence_df1<- NULL
+prov_incidence_df$incidence
 
 

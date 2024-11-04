@@ -9,6 +9,7 @@ document()
 test()
 check()
 
+?NMCleaner::mutate_district_name
 #ensure this is compiled
 
 
