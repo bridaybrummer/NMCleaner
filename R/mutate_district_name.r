@@ -1,12 +1,12 @@
-#' Title: Standardise District Names
+#' Standardise District Names
 #'
-#' I woudl recommend aggregating data before using this function to reduce run time (even thought it is farly fast already)
+#' I would recommend aggregating data before using this function to reduce run time (even thought it is farly fast already)
 #' Description: This script standardises district names across different datasets.
 #' @param data The dataset, or pipe it in.
 #' @param district_variable The name of the variable containing the district names.
 #' @return A dataset with the district names standardised.
 #' @export 
-#' #' @examples
+#' @examples
 #' new_master[sample(1000: 1),]%>%
 #'    mutate_district_name(., district_variable = "district")->
 #'    master_subset
