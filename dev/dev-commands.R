@@ -11,6 +11,8 @@ check()
 
 ?NMCleaner::mutate_district_name
 
+condition_df%>%setDT() 
+condition_df[nmccategories==1]
 #ensure this is compiled
 
 

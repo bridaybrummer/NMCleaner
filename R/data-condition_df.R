@@ -24,7 +24,10 @@
 
 # Define the conditions and their respective groups
 conditions <- c(
-  "Acute Flaccid Paralysis", "Acute rheumatic fever", "Botulism", "Cholera",
+  "Acute Flaccid Paralysis", 
+  "Acute rheumatic fever", 
+  "Agricultural or stock remedy poisoning",
+  "Botulism", "Cholera",
   "Crimean-Congo viral haemorrhagic fever (human)", "Ebola Virus (VHF)",
   "Lassa Fever Virus(VHF)", "Lujo Virus(VHF)", "Marburg Virus (VHF)",
   "Diphtheria", "Enteric fever (typhoid or paratyphoid fever)",
@@ -55,6 +58,7 @@ category_1 <- c(
   # cat 1
   "Acute Flaccid Paralysis",
   "Acute rheumatic fever",
+    "Agricultural or stock remedy poisoning",
   "Anthrax",
   "Botulism",
   "Cholera",
@@ -92,7 +96,7 @@ cat1_from_NMC_vector <- c(
 category_1<- c(category_1 ,cat1_from_NMC_vector) %>%str_to_lower() %>%str_to_sentence
 
 category_2<- c(
-  "Agricultural or stock remedy poisoning",
+  #"Agricultural or stock remedy poisoning", # is now a category 2 NMC 
   "Bilharzia (schistosomiasis)",
   "Brucellosis",
   "Congenital syphilis",
@@ -256,3 +260,4 @@ centre_contacts<- data.frame(province = c(centres),
 
 usethis::use_data(condition_df, overwrite = TRUE)
 
+condition_df%>%filter( nmccategories==1)

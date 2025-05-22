@@ -40,7 +40,7 @@ Depends:
     janitor,
     knitr,
     magrittr,
-    R (>= 2.10),
+    R (>= 3.5),
     readxl,
     sf,
     stringdist,
