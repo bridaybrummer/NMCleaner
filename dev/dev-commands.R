@@ -9,6 +9,8 @@ document()
 test()
 check()
 
+devtools::build()
+
 ?NMCleaner::mutate_district_name
 
 condition_df%>%setDT() 
