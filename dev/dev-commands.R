@@ -38,6 +38,7 @@ sample %>%ungroup()%>%
 
 NMCleaner::condition_df
 NMCleaner::infectious_diseases
+NMCleaner::mutate_district_name
 
 ?create_date_template
 
