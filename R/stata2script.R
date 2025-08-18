@@ -173,7 +173,8 @@ data16 <- data15 %>%
 
 
 # Create a data frame with the condition column
-dataCat1 <- data.frame(condition = c("Acute Flaccid Paralysis", "Acute rheumatic fever", "Botulism", "Cholera",
+dataCat1 <- data.frame(condition = c("Acute Flaccid Paralysis", "Acute rheumatic fever", 
+"Agricultural or stock remedy poisoning", "Botulism", "Cholera",
                                  "Crimean-Congo viral haemorrhagic fever (human)", "Ebola Virus (VHF)",
                                  "Lassa Fever Virus(VHF)", "Lujo Virus(VHF)", "Marburg Virus (VHF)",
                                  "Diphtheria", "Enteric fever (typhoid or paratyphoid fever)",

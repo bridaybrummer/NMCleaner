@@ -37,7 +37,7 @@ mutate_district_name <- function(data, district_variable = district_variable) {
             # Chris Hani
             c("Chris Hani", "Chris Hani District", "Chris Hani District Municipality", "DC13", "C.Hani"),
             # Joe Gqabi
-            c("Joe Gqabi", "Joe Gqabi District", "Joe Gqabi District Municipality", "DC14", "JGqabi"),
+            c("Joe Gqabi", "Joe Gqabi District", "Joe Gqabi District Municipality", "DC14", "JGqabi", "joe qadi"),
             # Nelson Mandela Bay
             c("Nelson Mandela Bay", "NMB", "Nelson Mandela Bay Metro", "Nelson Mandela Metropolitan Municipality"),
             # O.R. Tambo
@@ -79,7 +79,7 @@ mutate_district_name <- function(data, district_variable = district_variable) {
             # eThekwini
             c("eThekwini", "eThekwini Metro", "Durban", "eThekwini Municipality", "eThekwini Metropolitan"),
             # iLembe
-            c("iLembe", "iLembe District", "iLembe Municipality", "DC29"),
+            c("iLembe", "iLembe District", "iLembe Municipality", "DC29", "lembe"),
             # uMgungundlovu
             c("uMgungundlovu", "Umgungundlovu", "uMgungundlovu District", "DC22", "Umgung"),
             # uMkhanyakude
@@ -111,13 +111,13 @@ mutate_district_name <- function(data, district_variable = district_variable) {
             # Pixley ka Seme
             c("Pixley ka Seme", "Pixley ka Seme District", "Pixley ka Seme Municipality", "DC7"),
             # ZF Mgcawu
-            c("ZF Mgcawu", "Z F Mgcawu", "ZF Mgcawu District", "DC8"),
+            c("ZF Mgcawu", "Z F Mgcawu", "ZF Mgcawu District", "DC8", "siyanda"),
             # Bojanala Platinum
             c("Bojanala Platinum", "Bojanala", "Bojanala District", "DC37"),
             # Dr Kenneth Kaunda
-            c("Dr Kenneth Kaunda", "Dr Kenneth Kaunda District", "DC40", "D.K.Kaunda"),
+            c("Dr Kenneth Kaunda", "Dr Kenneth Kaunda District", "DC40", "D.K.Kaunda", "doctor kenneth kaunda"),
             # Dr Ruth Segomotsi Mompati
-            c("Dr Ruth Segomotsi Mompati", "Dr Ruth Mompati", "DC39", "Ruth Mompati"),
+            c("Dr Ruth Segomotsi Mompati", "Dr Ruth Mompati", "DC39", "Ruth Mompati", "doctor ruth segomotsi mompati"),
             # Ngaka Modiri Molema
             c("Ngaka Modiri Molema", "Ngaka Modiri", "DC38", "Modiri Molema"),
             # Cape Winelands

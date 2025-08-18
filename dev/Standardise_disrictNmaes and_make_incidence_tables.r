@@ -459,3 +459,184 @@ prov_incidence_df1<- NULL
 prov_incidence_df$incidence
 
 
+# New goal is to have sub-districts standardisation aswell as a "acronym" map for provinces
+
+#======================
+
+# standardised province map 
+
+#======================
+
+library(dplyr)
+library(tidyr)
+library(stringr)
+library(readr)
+
+# Canonical list
+canonical_provinces <- c(
+    "Eastern Cape", "Free State", "Gauteng", "KwaZulu-Natal",
+    "Limpopo", "Mpumalanga", "North West", "Northern Cape", "Western Cape"
+)
+
+# Variants (extend as you discover new ones)
+dict <- tibble::tribble(
+    ~standard_province, ~variant,
+    "Eastern Cape",     "eastern cape",
+    "Eastern Cape",     "ec",
+    "Eastern Cape",     "e cape",
+    "Eastern Cape",     "ecape",
+    "Free State",       "free state",
+    "Free State",       "fs",
+    "Free State",       "f state",
+    "Free State",       "fstate",
+    "Gauteng",          "gauteng",
+    "Gauteng",          "gp",
+    "Gauteng",          "gauteng province",
+    "KwaZulu-Natal",    "kwazulu natal",
+    "KwaZulu-Natal",    "kwa zulu natal",
+    "KwaZulu-Natal",    "kwa-zulu natal",
+    "KwaZulu-Natal",    "kzn",
+    "Limpopo",          "limpopo",
+    "Limpopo",          "lp",
+    "Mpumalanga",       "mpumalanga",
+    "Mpumalanga",       "mp",
+    "North West",       "north west",
+    "North West",       "nw",
+    "North West",       "n west",
+    "North West",       "nwest",
+    "Northern Cape",    "northern cape",
+    "Northern Cape",    "nc",
+    "Northern Cape",    "n cape",
+    "Northern Cape",    "ncape",
+    "Western Cape",     "western cape",
+    "Western Cape",     "wc",
+    "Western Cape",     "w cape",
+    "Western Cape",     "wcape"
+) %>%
+    # A helper normalized form used for fast exact matches
+    mutate(
+        variant_norm = variant %>%
+            str_to_lower() %>%
+            str_replace_all("[^a-z]", "") # strip spaces, hyphens, etc.
+    )
+
+# Optionally store
+# write_csv(dict, "data/province_dictionary.csv")
+
+mutate_standard_provinces <- function(data, province_var, dict,
+                                      use_fuzzy = TRUE, max_dist = 2) {
+    stopifnot(all(c("standard_province", "variant", "variant_norm") %in% names(dict)))
+    require(dplyr)
+    require(stringr)
+
+    # tidy-eval for column name
+    province_var <- rlang::ensym(province_var)
+
+    normalize <- function(x) {
+        x %>%
+            str_to_lower() %>%
+            str_replace_all("[^a-z]", "") # keep only letters
+    }
+
+    # 1) Add normalized text and try exact normalized join
+    d1 <- data %>%
+        mutate(
+            .prov_raw = as.character(!!province_var),
+            .prov_norm = normalize(.prov_raw)
+        )
+
+    exact_join <- d1 %>%
+        left_join(dict %>% distinct(standard_province, variant_norm),
+            by = c(".prov_norm" = "variant_norm")
+        ) %>%
+        mutate(.match_method = if_else(!is.na(standard_province), "exact_norm", NA_character_))
+
+    # helper for unmatched rows
+    unmatched <- exact_join %>% filter(is.na(standard_province))
+
+    # 2) Regex keywords pass (e.g., "n cape" -> Northern Cape)
+    if (nrow(unmatched) > 0) {
+        # make a regex dictionary (escape user text; add common short forms manually if needed)
+        regex_dict <- dict %>%
+            mutate(pattern = paste0("\\b", str_replace_all(variant, "\\s+", "\\\\s*"), "\\b")) %>%
+            distinct(standard_province, pattern)
+
+        # For speed, do a rowwise scan only for the still-unmatched
+        map_regex <- function(txt) {
+            hit <- regex_dict$standard_province[str_detect(str_to_lower(txt), regex(regex_dict$pattern, ignore_case = TRUE))]
+            if (length(hit) >= 1) hit[[1]] else NA_character_
+        }
+
+        regex_matched <- unmatched %>%
+            mutate(standard_province = vapply(.prov_raw, map_regex, character(1))) %>%
+            mutate(.match_method = if_else(!is.na(standard_province), "regex", NA_character_))
+
+        # merge back
+        exact_join <- exact_join %>%
+            filter(!is.na(standard_province)) %>%
+            bind_rows(regex_matched)
+    }
+
+    # 3) Optional fuzzy fallback using string distance
+    if (use_fuzzy) {
+        still_unmatched <- exact_join %>% filter(is.na(standard_province))
+        if (nrow(still_unmatched) > 0) {
+            # fuzzy against variant_norm
+            require(fuzzyjoin)
+            fuzzy_candidates <- dict %>%
+                distinct(standard_province, variant_norm)
+
+            fuzzy_joined <- fuzzyjoin::stringdist_left_join(
+                still_unmatched,
+                fuzzy_candidates,
+                by = c(".prov_norm" = "variant_norm"),
+                method = "osa",
+                max_dist = max_dist,
+                distance_col = ".dist"
+            ) %>%
+                group_by(across(names(still_unmatched))) %>% # one best match per row
+                slice_min(order_by = .dist, n = 1, with_ties = FALSE) %>%
+                ungroup() %>%
+                mutate(.match_method = if_else(!is.na(standard_province), "fuzzy", NA_character_)) %>%
+                select(-.dist)
+
+            # rows that got a fuzzy match replace the unmatched ones
+            exact_join <- exact_join %>%
+                filter(!is.na(standard_province)) %>%
+                bind_rows(fuzzy_joined)
+        }
+    }
+
+    # 4) Finalize outputs
+    out <- exact_join %>%
+        mutate(
+            standard_province = dplyr::coalesce(standard_province, .prov_raw), # leave as-is if still NA
+            .matched = if_else(.match_method %in% c("exact_norm", "regex", "fuzzy"), TRUE, FALSE)
+        ) %>%
+        select(-.prov_norm)
+
+    out
+}
+
+
+# Example usage 
+library(dplyr)
+
+sample_df <- tibble::tibble(
+    id = 1:12,
+    prov = c(
+        "KZN", "Kwa Zulu Natal", "EC", "E. Cape", "Gauteng Province", "GP",
+        "N Cape", "North-West", "Limpopo", "MP", "W. Cape", "Free  State"
+    )
+)
+
+res <- mutate_standard_provinces(
+    data = sample_df,
+    province_var = prov,
+    dict = dict, # from step 1
+    use_fuzzy = TRUE,
+    max_dist = 2
+)
+
+res %>%
+    select(id, prov, standard_province, .match_method, .matched)
