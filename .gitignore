@@ -6,3 +6,16 @@
 .quarto
 Building.R
 inst/doc
+
+# Ignore shapefiles and shape directory (large binary GIS files)
+shape/
+shape/*
+
+# Ignore local raw data that should not be committed
+data-raw/
+
+# Ignore built package tarballs
+*.tar.gz
+
+# Ignore temporary backups
+*.backup

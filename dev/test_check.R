@@ -38,3 +38,4 @@ test_lint_check <- function(run_lintr = FALSE) {
 }
 
 message("Loaded dev/test_check.R: use run_tests(), run_linters(), run_check(), test_lint_check()")
+message("Reminder: run `git status` before committing. Avoid committing large binary data (e.g. shape/) — keep them in .gitignore or use Git LFS.")

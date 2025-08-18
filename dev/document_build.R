@@ -42,3 +42,4 @@ document_and_build <- function(path = "./", vignettes = TRUE) {
 }
 
 message("Loaded dev/document_build.R: use document_package(), build_package(), build_pkgdown_site(), document_and_build()")
+message("Important: Run `git status` before committing. Do NOT commit large raw data or the 'shape/' directory. Use .gitignore to exclude them.")

@@ -53,3 +53,4 @@ release_flow <- function(version_type = c("patch", "minor", "major"), news_title
 }
 
 message("Loaded dev/release_helper.R: use bump_version(), append_news(), prepare_release(), release_flow()")
+message("Before releasing: ensure large data (shape/, data-raw/) are not committed. Run `git status` and confirm .gitignore includes these paths.")

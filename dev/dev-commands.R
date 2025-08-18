@@ -51,3 +51,4 @@ dev_all <- function() {
 # Helpful reminders printed when sourcing
 message("Loaded dev helper functions: dev_document_all, dev_load, dev_test_all, dev_check, dev_build_pkg, dev_all")
 message("Use these interactively. Avoid sourcing in non-interactive CI environments.")
+message("Reminder: run `git status` before committing changes. Ensure large files (shape/, data-raw/) are ignored in .gitignore.")
