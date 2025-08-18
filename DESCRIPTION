@@ -1,20 +1,22 @@
 Package: NMCleaner
 Title: Provides sets of simplified tools to clean and analyse NMC data.
-Version: 0.0.0.9000
-Authors@R: 
-    person("Brian", "Brummer", , "brianb@nicd.ac.za", role = c("aut", "cre"),
-           comment = c(ORCID = "0000-0003-4626-416X"))
+Version: 0.0.0.9001
+Authors@R: person(given = "Brian", family = "Brummer",
+    email = "brianb@nicd.ac.za",
+    role = c("aut", "cre"),
+    comment = c(ORCID = "0000-0003-4626-416X"))
 Description: 
     Assist NMC users to conduct standardised data management, 
     wrangling and analysis of NMC data. 
     The package is designed to ingest raw NMC data form the linelist 
     export function on the NMC web-based application. 
     The package include sample data [`sample'] aswell 
-    as shape files for administration boundaries and collated Mid-Year-Population-Estimates.
+    as shape files for administration boundaries and collated Mid-Year-Population-Estimates
+    that are compatible down to the sub-district level.
     See more details on the web address below. 
     The package is still under development and is not yet available on CRAN.
 URL: https://github.com/bridaybrummer/NMCleaner
-License: `use_mit_license()`
+License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
