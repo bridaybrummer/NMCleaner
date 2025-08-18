@@ -14,3 +14,4 @@
 ^\.Rcheck$
 ^README\.Rmd$
 ^README\.md$
+^shape$
