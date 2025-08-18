@@ -1,81 +1,53 @@
+# Development workflow helpers for NMCleaner
+# Run from package root (use Projects or setwd to package root)
+# This script is intended to be sourced interactively, not run in CI.
+
+# Usage examples:
+# source("dev/dev-commands.R")
+# dev_document_all()
+# dev_test_all()
 
 library(devtools)
+library(usethis)
 
-use_data_raw()
+# 1. Document and update NAMESPACE and Rd files
+dev_document_all <- function() {
+  message("Running devtools::document()")
+  devtools::document()
+}
 
-document()
-load_all()
-document()
-test()
-check()
+# 2. Load package into current R session for interactive testing
+dev_load <- function() {
+  message("Loading package with devtools::load_all()")
+  devtools::load_all()
+}
 
-devtools::build()
+# 3. Run tests
+dev_test_all <- function() {
+  message("Running testthat tests")
+  devtools::test()
+}
 
-?NMCleaner::mutate_district_name
+# 4. Run package checks (recommended before release)
+dev_check <- function() {
+  message("Running devtools::check() - this may take a while")
+  devtools::check()
+}
 
-condition_df%>%setDT() 
-condition_df[nmccategories==1]
-#ensure this is compiled
+# 5. Build package tarball
+dev_build_pkg <- function() {
+  message("Building package tar.gz")
+  devtools::build()
+}
 
+# 6. Convenience: run document, test, check sequentially
+dev_all <- function() {
+  dev_document_all()
+  dev_load()
+  dev_test_all()
+  dev_check()
+}
 
-# Test the epicurve_df() with grouping_vars = NULL
-
-#OR
-
-# Test the epicurve_df() with grouping_vars where the grouping_vars length ==1
-
-sample %>%
-  filter( condition %in% "Measles")->sample1
-
-NULL %>% { if (is.null(.)) "NULL" else . } %in% "string"
-
-"string" %>% { if (is.null(.)) "NULL" else . } %in% "string"
-
-sample %>%ungroup()%>%
-  filter( condition %in% "Measles")%>%
-  epicurve_df(
-    date_index = "notification_date",
-    grouping_vars = "other"
-  )
-
-NMCleaner::condition_df
-NMCleaner::infectious_diseases
-NMCleaner::mutate_district_name
-
-?create_date_template
-
-epicurve_template<-create_date_template(
-  min(dates), max(dates),
-  reps = length(data[[grouping_vars]]%>%unique),
-  rep_on_var = data[[grouping_vars]]%>%unique,
-  rep_var_name = grouping_vars)
-
-create_date_template(
-  start_date = min(sample1$notification_date),
-  end_date = max(sample1$notification_date),
-  reps = 1,
-  rep_on_var = sample1$condition %>%unique(),
-  rep_var_name = c("condition")
-)
-
-
-epicurve_template<-create_date_template(min(dates), max(dates),
-                                        reps = length(data[[grouping_vars]]%>%unique),
-                                        rep_on_var = data[[grouping_vars]]%>%unique,
-                                        rep_var_name = grouping_vars)
-
-epicurve_template<-
-  tibble(
-    !!"condition" := rep(sample1[["condition"]] %>%unique(), each = length(10)),
-  )
-
-epicurve_template
-
-
-sample %>%
-  ungroup()%>%
-  #filter( condition %in% "Measles")%>%
-  epicurve_df(
-    date_index = "notification_date",
-    grouping_vars = "condition"
-  )
+# Helpful reminders printed when sourcing
+message("Loaded dev helper functions: dev_document_all, dev_load, dev_test_all, dev_check, dev_build_pkg, dev_all")
+message("Use these interactively. Avoid sourcing in non-interactive CI environments.")

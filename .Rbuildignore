@@ -5,3 +5,12 @@
 ^data-raw$
 ^dev$
 ^.vscode$
+^\.Rhistory$
+^\.RData$
+^\.DS_Store$
+^\.env$
+^\.Renviron$
+^inst/doc$
+^\.Rcheck$
+^README\.Rmd$
+^README\.md$
