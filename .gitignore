@@ -11,6 +11,9 @@ inst/doc
 shape/
 shape/*
 
+pop/
+pop/*
+
 # Ignore local raw data that should not be committed
 data-raw/
 

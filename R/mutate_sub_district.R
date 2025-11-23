@@ -1,6 +1,6 @@
 #' Standardise subdistrict names
 #'
-#' Take a data frame with a free-text subdistrict column and return the data
+#' STILL UNDER DEV: Take a data frame with a free-text subdistrict column and return the data
 #' frame with a standardised subdistrict name column (`subdistrict_standard`) and
 #' a match-method column (`.sd_match_method`). The function uses an internal
 #' dictionary (built by `build_sa_subdistrict_dictionary()`) and performs
@@ -123,7 +123,7 @@ mutate_sub_district<- function(data,
         x <- stringr::str_replace_all(x, "[^a-z0-9]+", "")
 
         # replace "doctor" with "dr"
-        x <- stringr::str_replace_all(x, "\\bdoctor\\b", "dr")
+        x <- stringr::str_replace_all(x, "doctor", "dr")
         # do the same for saint -> st
         x <- stringr::str_replace_all(x, "saint", "st")
         # replace special characters like "é" with standard letters
@@ -140,11 +140,21 @@ mutate_sub_district<- function(data,
     }
 
 
-    dict_long <- attr(dict, "long_version")
-    if (is.null(dict_long)) {
-        dict_long <- tidyr::unnest(dict, cols = "subdistrict_variant", names_repair = "minimal") |>
-            dplyr::rename(variant = subdistrict_variant) |>
-            dplyr::mutate(variant_norm = normalize_key(variant))
+    # Only construct dict_long here if it hasn't already been set above.
+    if (!exists("dict_long")) {
+        dict_long <- NULL
+        # Prefer an attached long_version if dict is a list-column object
+        if (!is.null(dict) && !is.null(attr(dict, "long_version"))) {
+            dict_long <- attr(dict, "long_version")
+        } else if (!is.null(dict) && is.data.frame(dict) && all(c("standard_subdistrict", "variant") %in% names(dict))) {
+            dict_long <- dict
+        } else if (!is.null(dict) && is.data.frame(dict) && "subdistrict_variant" %in% names(dict)) {
+            dict_long <- dict %>% dplyr::rename(variant = subdistrict_variant) %>% dplyr::mutate(variant_norm = normalize_key(variant))
+        }
+
+        if (is.null(dict_long)) {
+            stop("No usable dictionary found: provide 'dict' or ensure 'inst/extdata/sa_subdistrict_dictionary.rds' exists or build the dictionary via build_sa_subdistrict_dictionary().")
+        }
     }
 
     # fast exact-normalized map
@@ -224,3 +234,21 @@ if (isTRUE(use_fuzzy)) {
     data$.sd_match_method <- match_method
     data
 }
+
+
+# example usage 
+ #generate_sa_subdistrict_dictionary(save_inst_rds = TRUE, overwrite = TRUE) -> v2_subdistricts
+
+#v2_subdistricts$dict_listcol
+
+#dict <- readr::read_rds("inst/extdata/sa_subdistrict_dictionary.rds")
+#dict
+#mutate_sub_district( 
+#    data.frame( subdistrict = c("mother city", "ekurhuleni north 1","ekurhuleni", "thabo mofutsnyane", "manguang", "mosselbaai" ,"port saint john", "city of cape town", "Doctor js morkoa", "Dr pixley isaka seme", "nelson mandela bay", "port rex", "cit of jobrg")), 
+#    dict = dict
+#)
+
+#mutate_sub_district(
+#    data.frame(district = c("mother city", "ekurhuleni north 1", "ekurhuleni", "thabo mofutsnyane", "manguang", "mosselbaai", "port saint john", "city of cape town", "Doctor js morkoa", "Dr pixley isaka seme", "nelson mandela bay", "port rex", "cit of jobrg")),
+    #    dict = dict
+#)

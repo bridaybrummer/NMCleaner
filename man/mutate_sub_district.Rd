@@ -43,7 +43,7 @@ The input \code{data} with two new columns appended:
 }
 }
 \description{
-Take a data frame with a free-text subdistrict column and return the data
+STILL UNDER DEV: Take a data frame with a free-text subdistrict column and return the data
 frame with a standardised subdistrict name column (\code{subdistrict_standard}) and
 a match-method column (\code{.sd_match_method}). The function uses an internal
 dictionary (built by \code{build_sa_subdistrict_dictionary()}) and performs

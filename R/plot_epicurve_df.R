@@ -1,4 +1,4 @@
-#' Plots a simple epicurve with options from the epicurve_df() function.
+#' Plots a simple epicurve with options from the epicurve_df() function. Requires dev around changing the winds and how that relates to the rolling average. The rollin g average is currentl made for a 7 day rolling average using epiweeks. 
 #'
 #' @param data a dataframe that has been processed by the epicurve_df() function
 #' @param x_axis_option a string that can be one of the following: "epiweek", "day_month_year", "month_year" The string is evaluated wiht a jarowinkler score enabling ingestion of arguments with small errors.

@@ -2,7 +2,7 @@
 % Please edit documentation in R/plot_epicurve_df.R
 \name{plot_epicurve_df}
 \alias{plot_epicurve_df}
-\title{Plots a simple epicurve with options from the epicurve_df() function.}
+\title{Plots a simple epicurve with options from the epicurve_df() function. Requires dev around changing the winds and how that relates to the rolling average. The rollin g average is currentl made for a 7 day rolling average using epiweeks.}
 \usage{
 plot_epicurve_df(
   data = data,
@@ -41,7 +41,7 @@ plot_epicurve_df(
 returns a ggplot object
 }
 \description{
-Plots a simple epicurve with options from the epicurve_df() function.
+Plots a simple epicurve with options from the epicurve_df() function. Requires dev around changing the winds and how that relates to the rolling average. The rollin g average is currentl made for a 7 day rolling average using epiweeks.
 }
 \examples{
 df_to_plot<- epicurve_df(patient_level_data = ,
