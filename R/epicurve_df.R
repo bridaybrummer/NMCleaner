@@ -17,7 +17,6 @@
 #' @import dplyr
 #' @import lubridate
 #' @importFrom zoo rollmean rollapply
-#' @import grates
 #' @importFrom tidyr complete
 #' @importFrom stats poisson.test
 #'

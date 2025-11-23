@@ -25,7 +25,6 @@ Imports:
     dplyr,
     grates,
     tidyr, 
-    rpart, 
     progress
 Depends: 
     lubridate,
