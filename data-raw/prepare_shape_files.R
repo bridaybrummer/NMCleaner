@@ -1,7 +1,7 @@
 # Purpose: 
 #  - This script will show the sources via URL of shape files aswell as cleaning processes for province, district and subdistrict shape files 
 
-NMCleaner::shape_files$sub_district%>%names()
+#NMCleaner::shape_files$sub_district%>%names()
 
 library(sf)
 library(dplyr)
